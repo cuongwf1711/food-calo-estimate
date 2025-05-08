@@ -1,0 +1,23 @@
+[project]
+name = "food-calo-estimate"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "cuongwf1711",email = "ruivalien@gmail.com"}
+]
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "djangorestframework (>=3.16.0,<4.0.0)",
+    "python-decouple (>=3.8,<4.0)",
+    "pre-commit (>=4.2.0,<5.0.0)",
+    "pylint (>=3.3.7,<4.0.0)"
+]
+
+[tool.poetry]
+packages = [{include = "food_calo_estimate", from = "src"}]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
