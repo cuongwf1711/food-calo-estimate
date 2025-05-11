@@ -1,0 +1,8 @@
+{% for key, value in data.items %}
+    <div class="content-row">
+        <div class="content-key"><strong>{{ key }}</strong></div>
+        {% if value %}
+            <div class="content-value">{{ value }}</div>
+        {% endif %}
+    </div>
+{% endfor %}

@@ -2,5 +2,5 @@ from django.apps import AppConfig
 
 
 class EstimatorConfig(AppConfig):
-    default_auto_field = 'django.db.models.BigAutoField'
-    name = 'estimator'
+    default_auto_field = "django.db.models.BigAutoField"
+    name = "FoodCaloEstimate.estimator"

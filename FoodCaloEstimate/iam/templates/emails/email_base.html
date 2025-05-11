@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Email{% endblock %}</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.5;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f8f8;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 6px;
+            overflow: hidden;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .header {
+            text-align: center;
+            padding: 15px;
+            background-color: #f0f7ff;
+            border-bottom: 1px solid #e1e8ed;
+        }
+
+        .header h1 {
+            color: #2c5282;
+            margin-top: 10px;
+            font-size: 20px;
+        }
+
+        .logo {
+            max-width: 120px;
+            height: auto;
+        }
+
+        .content {
+            padding: 20px 30px;
+            text-align: center;
+        }
+
+        .content-row {
+            text-align: center;      /* canh ngang */
+            margin: 10px 0;          /* khoảng cách giữa các mục */
+        }
+        .content-key,
+        .content-value {
+            display: block;          /* mỗi mục trên một dòng */
+        }
+
+        .footer {
+            text-align: center;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-top: 1px solid #e1e8ed;
+            color: #666;
+        }
+
+        .footer-images {
+            margin: 10px 0;
+        }
+
+        .footer-images img {
+            width: 50px;
+            height: 50px;
+            vertical-align: middle;
+        }
+
+        .footer .contact-info {
+            margin-top: 12px;
+        }
+
+        .footer .contact-info a {
+            color: #3182ce;
+        }
+
+        @media only screen and (max-width: 620px) {
+            .container {
+                width: 100% !important;
+            }
+
+            .content {
+                padding: 15px !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        {% include 'emails/header.html' %}
+
+        <div class="content">
+            {% block content %}
+                {% include 'emails/_rows.html' %}
+            {% endblock %}
+        </div>
+
+        {% include 'emails/footer.html' %}
+    </div>
+</body>
+
+</html>
