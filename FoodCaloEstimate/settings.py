@@ -217,7 +217,7 @@ CONTACT_EMAIL = config("CONTACT_EMAIL", default="")
 # DEFAULT_USER
 ADMIN_USERNAME = config("ADMIN_USERNAME", "a")
 ADMIN_PASSWORD = config("ADMIN_PASSWORD", "")
-DUMMY_USERNAME = config("DUMMY_USERNAME", "guest")
+DUMMY_USERNAME = config("DUMMY_USERNAME", "guest@example.com")
 DUMMY_PASSWORD = config("DUMMY_PASSWORD", "")
 
 # CELERY

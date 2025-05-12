@@ -8,13 +8,12 @@
 import uuid
 
 from django.contrib.auth.models import AbstractUser
-from django.db import models
+
+from FoodCaloEstimate.iam.models.base_model import UUIDModel
 
 
-class User(AbstractUser):
+class User(AbstractUser, UUIDModel):
     """Account model with custom fields."""
-
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
     def __str__(self):
         """Return username."""

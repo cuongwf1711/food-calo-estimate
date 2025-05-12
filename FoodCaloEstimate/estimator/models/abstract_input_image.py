@@ -1,0 +1,46 @@
+# Copyright (C)
+# date: 12-05-2025
+# author: cuongwf1711
+# email: ruivalien@gmail.com
+
+"""Abstract Input Image."""
+
+from django.contrib.auth import get_user_model
+from django.core.validators import MaxValueValidator, MinValueValidator
+from django.db import models
+
+from FoodCaloEstimate.iam.constants.django_model_constant import MAX_LENGTH_CHAR_FIELD
+from FoodCaloEstimate.iam.models.base_model import AutoTimeStampedModel, UUIDModel
+
+User = get_user_model()
+
+DEFAULT_UNKNOWN_LABEL = -1
+
+
+class AbstractInputImage(AutoTimeStampedModel, UUIDModel):
+    """Abstract Input Image."""
+
+    url = models.JSONField()
+    label = models.IntegerField(default=DEFAULT_UNKNOWN_LABEL)
+    predict = models.IntegerField(default=DEFAULT_UNKNOWN_LABEL)
+    confidence = models.FloatField(
+        validators=[MinValueValidator(0.0), MaxValueValidator(1.0)]
+    )
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="uploaded_images"
+    )
+    staff = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="labeled_images", null=True
+    )
+    comment = models.CharField(max_length=MAX_LENGTH_CHAR_FIELD, blank=True)
+
+    @property
+    def confidence_percentage(self):
+        """Return confidence as a formatted percentage."""
+        return f"{self.confidence * 100:.2f}%"
+
+    class Meta:
+        """Meta class for AbstractInputImage."""
+
+        abstract = True
+        ordering = ["-created_at"]

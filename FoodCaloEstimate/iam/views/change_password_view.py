@@ -35,5 +35,4 @@ class ChangePasswordView(APIView):
             )
         return Response(
             get_message_response(success=True, message=CHANGE_PASSWORD_SUCCESS),
-            status=status.HTTP_200_OK,
         )

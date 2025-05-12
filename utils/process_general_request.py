@@ -20,5 +20,9 @@ def process_general_request(
         instance, data=request.data, context={"request": request}, partial=partial
     )
     serializer.is_valid(raise_exception=True)
-    serializer.save()
-    return Response(response_data or serializer.data, status=status_code)
+
+    saved_instance = serializer.save()
+    if response_data is None:
+        response_data = saved_instance
+
+    return Response(response_data, status=status_code)

@@ -7,9 +7,10 @@
 
 from django.urls import path, include
 
-from FoodCaloEstimate.iam.urls import auth_urls
+from FoodCaloEstimate.iam.urls.auth_urls import urlpatterns as auth_urls
 
 
 urlpatterns = [
-    path("/auth", include(auth_urls), name="auth"),
-]
+    # custom prefix
+    # path("", include(auth_urls)),
+] + auth_urls
