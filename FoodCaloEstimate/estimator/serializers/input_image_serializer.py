@@ -36,7 +36,6 @@ from FoodCaloEstimate.estimator.services.local_storage_service import (
 from FoodCaloEstimate.estimator.services.machine_leaning_service import (
     MachineLearningService,
 )
-from FoodCaloEstimate.iam.constants.django_model_constant import MAX_LENGTH_CHAR_FIELD
 from FoodCaloEstimate.queue_tasks import run_parallel_tasks_in_queue
 
 
@@ -68,18 +67,28 @@ class InputImageSerializer(serializers.ModelSerializer):
             "predict",
             "confidence",
             "comment",
-            "calo",
+            # "calo",
             "public_url",
             "predict_text",
+            "created_at",
         ]
-        read_only_fields = ["id", "predict", "confidence", "calo"]
+        read_only_fields = ["id", "predict", "confidence", "created_at"]
+        # extra_kwargs = {
+        #     "calo": {"required": False},
+        # }
 
     def validate_comment(self, value):
-        create = not self.instance and value
         already_comment = self.instance and self.instance.comment
-        if create or already_comment:
+        if already_comment:
             raise serializers.ValidationError("Comment is not allowed.")
         return value
+
+    # def validate_calo(self, value):
+    #     """Validate calo."""
+    #     already_comment = self.instance and self.instance.comment
+    #     if already_comment:
+    #         raise serializers.ValidationError("Calo is not allowed.")
+    #     return value
 
     def validate_image_file(self, image):
         """Validate method."""
@@ -95,29 +104,41 @@ class InputImageSerializer(serializers.ModelSerializer):
         """Create."""
         image_file = validated_data.pop("image_file")
         validated_data.clear()
-        origin_image_cloudinary = CloudinaryService().upload_image(
-            image_file, ORIGIN_IMAGE
-        )
-        origin_image_local = LocalStorageService().upload_image(
-            image_file, ORIGIN_IMAGE
-        )
-        confidence, label = ModelManager.get_model(EfficientNetV2).predict(image_file)
+
+        validated_data["confidence"], validated_data["predict"] = ModelManager.get_model(
+            EfficientNetV2
+        ).predict(image_file)
         (food_pixel_area, reference_point_pixel_area), byteio = ModelManager.get_model(
             SegmentationModel_Key
         ).get_area_food_from_text_prompt(image_file)
-        segmentation_image_cloudinary = CloudinaryService().upload_image(
-            byteio, SEGMENTATION_IMAGE
-        )
-        segmentation_image_local = LocalStorageService().upload_image(
-            byteio, SEGMENTATION_IMAGE
+
+        image_file.seek(0)
+        image_byteio = io.BytesIO(image_file.read())
+
+        origin_image_cloudinary, \
+        origin_image_local, \
+        segmentation_image_cloudinary, \
+        segmentation_image_local, \
+        validated_data["calo"] = run_parallel_tasks_in_queue(
+            (
+                CloudinaryService().upload_image,
+                (image_byteio, ORIGIN_IMAGE),
+                {}
+            ),
+            (
+                LocalStorageService().upload_image,
+                (image_byteio, ORIGIN_IMAGE),
+                {}
+            ),
+            (CloudinaryService().upload_image, (byteio, SEGMENTATION_IMAGE), {}),
+            (LocalStorageService().upload_image, (byteio, SEGMENTATION_IMAGE), {}),
+            (
+                MachineLearningService.calculate_calories,
+                (validated_data["predict"], food_pixel_area, reference_point_pixel_area),
+                {}
+            ),
         )
 
-        calo = MachineLearningService.calculate_calories(
-            label, food_pixel_area, reference_point_pixel_area
-        )
-        validated_data["calo"] = calo
-        validated_data["predict"] = label
-        validated_data["confidence"] = confidence
         validated_data["url"] = {
             ORIGIN_IMAGE: {
                 **origin_image_cloudinary,
@@ -135,10 +156,9 @@ class InputImageSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         """Update."""
         comment = validated_data.pop("comment", None)
+        validated_data.clear()
         if comment:
-            validated_data = {
-                "comment": comment,
-            }
+            validated_data["comment"] = comment
         return super().update(instance, validated_data)
 
 

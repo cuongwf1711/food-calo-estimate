@@ -29,7 +29,7 @@ from FoodCaloEstimate.iam.views.command_view import run_command
 
 api_v1_prefix = "api/v1"
 urlpatterns = [
-    path("admin/", admin.site.urls),
+    path("admin", admin.site.urls),
     path("api/command", run_command, name="run_command"),
 
     path("api/schema", SpectacularAPIView.as_view(), name="schema"),
@@ -39,8 +39,8 @@ urlpatterns = [
         name="swagger-ui",
     ),
     # path(
-    #     'api/schema/redoc/', 
-    #     SpectacularRedocView.as_view(url_name='schema'), 
+    #     'api/schema/redoc/',
+    #     SpectacularRedocView.as_view(url_name='schema'),
     #     name='redoc'
     # ),
 
@@ -50,5 +50,5 @@ urlpatterns = [
         include("FoodCaloEstimate.estimator.urls"),
         name="estimator",
     ),
-    
+
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

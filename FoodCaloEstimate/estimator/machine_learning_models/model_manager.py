@@ -59,6 +59,4 @@ class ModelManager:
                 "Models have not been initialized. Call initialize_models() first."
             )
 
-        if model_name in cls._models:
-            return cls._models[model_name]
-        raise KeyError(f"Not found model: {model_name}")
+        return cls._models.get(model_name, EfficientNetV2)

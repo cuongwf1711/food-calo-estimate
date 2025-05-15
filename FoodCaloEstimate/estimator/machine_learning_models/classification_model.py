@@ -29,7 +29,7 @@ class ClassificationModel:
         )
 
         self.model.load_state_dict(
-            torch.load(checkpoint_path, weights_only=True, map_location=DEVICE)
+            torch.load(checkpoint_path, weights_only=True, map_location=DEVICE, mmap=True)
         )
 
         self.model = self.model.to(DEVICE).eval()
