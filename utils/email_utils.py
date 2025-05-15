@@ -55,7 +55,7 @@ class EmailService:
     def send(self):
         """Send."""
         print(self.context)
-        # return
+        return
         self._build_context()
         html = render_to_string(self.template, self.context)
         text = strip_tags(html)

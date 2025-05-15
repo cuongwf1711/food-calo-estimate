@@ -28,3 +28,5 @@ app.conf.update(
     worker_shutdown_timeout=60,  # seconds
     broker_connection_retry_on_startup=True,
 )
+
+shared_task = app.task

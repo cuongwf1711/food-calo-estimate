@@ -148,8 +148,8 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=10),
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=14),
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=30),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=30),
     "CHECK_REVOKE_TOKEN": True,
     "REVOKE_TOKEN_CLAIM": "changed_pw",
 }
@@ -194,6 +194,8 @@ STATIC_URL = "static/"
 
 MEDIA_ROOT = os.path.join(BASE_DIR, "media/")
 MEDIA_URL = "/media/"
+MAIN_URL = config("MAIN_URL", default="http://localhost:8000")
+MAIN_MEDIA_URL = MAIN_URL + MEDIA_URL
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -226,3 +228,9 @@ CELERY_TASK_TIME_LIMIT = 10 * 60  # 10 minutes
 CELERY_BROKER_URL = config("CELERY_BROKER_URL", "")
 REDIS_DB_CELERY_RESULT_BACKEND = config("REDIS_DB_CELERY_RESULT_BACKEND", 2)
 CELERY_RESULT_BACKEND = REDIS_CONNECTION_URL + f"/{REDIS_DB_CELERY_RESULT_BACKEND}"
+CELERY_ACCEPT_CONTENT = ["json", "pickle"]
+
+# Cloudinary
+CLOUDINARY_CLOUD_NAME = config("CLOUDINARY_CLOUD_NAME", "")
+CLOUDINARY_API_KEY = config("CLOUDINARY_API_KEY", "")
+CLOUDINARY_API_SECRET = config("CLOUDINARY_API_SECRET", "")
