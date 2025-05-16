@@ -16,6 +16,8 @@ from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 
+from FoodCaloEstimate.iam.constants.general_constants import AUTHOR
+
 
 class EmailService:
     """Utility for building and sending emails with attachments and inline images."""
@@ -96,7 +98,7 @@ class EmailService:
 
         email.send()
 
-    def _build_context(self) -> dict:
+    def _build_context(self):
         self.context["current_year"] = datetime.now().year
         self.context["email"] = settings.CONTACT_EMAIL
-        self.context["author"] = "cuongwf1711"
+        self.context["author"] = AUTHOR

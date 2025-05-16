@@ -17,6 +17,7 @@ from FoodCaloEstimate.estimator.constants.machine_learning_constants import (
 from FoodCaloEstimate.estimator.constants.my_food_calo_estimate_constants import (
     NUM_CLASSES,
 )
+from FoodCaloEstimate.estimator.utils.clear_data import clear_data
 
 
 class ClassificationModel:
@@ -32,13 +33,10 @@ class ClassificationModel:
             torch.load(checkpoint_path, weights_only=True, map_location=DEVICE, mmap=True)
         )
 
-        self.model = self.model.to(DEVICE).eval()
+        self.model.to(DEVICE).eval()
 
         data_config = timm.data.resolve_model_data_config(self.model)
 
-        self.train_transforms = timm.data.create_transform(
-            **data_config, is_training=True
-        )
         self.val_transforms = timm.data.create_transform(
             **data_config, is_training=False
         )
@@ -51,11 +49,9 @@ class ClassificationModel:
     ) -> int:
         """Predict."""
         # Preprocess the input image
-        tensor_batch = (
-            self.val_transforms(Image.open(input_image).convert("RGB"))
-            .unsqueeze(0)
-            .to(DEVICE)
-        )
+        with Image.open(input_image) as raw_img:
+            tensor_batch = self.val_transforms(raw_img.convert("RGB"))
+        tensor_batch = tensor_batch.unsqueeze(0).to(DEVICE)
 
         # Forward pass
         raw_logits = self.model(tensor_batch)
@@ -63,9 +59,11 @@ class ClassificationModel:
 
         # Get the predicted class index and confidence score
         confidence_score, predicted_idx = probabilities.max(dim=1)
-        conf = confidence_score.item()
-        idx = predicted_idx.item()
+        confidence_score = confidence_score.item()
+        predicted_idx = predicted_idx.item()
 
-        if conf < confidence_threshold:
-            return 1 - conf, -1
-        return conf, idx
+        clear_data(tensor_batch, raw_logits, probabilities)
+
+        if confidence_score < confidence_threshold:
+            return 1 - confidence_score, -1
+        return confidence_score, predicted_idx

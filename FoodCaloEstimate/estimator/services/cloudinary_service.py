@@ -8,11 +8,11 @@
 import os
 
 import cloudinary
+import cloudinary.api
 import cloudinary.uploader
 from django.conf import settings
 
 from FoodCaloEstimate.estimator.constants.image_constants import (
-    CLOUDINARY_PATH,
     CLOUDINARY_PUBLIC_ID,
     CLOUDINARY_SECURE_URL,
     ORIGIN_IMAGE,
@@ -41,3 +41,19 @@ class CloudinaryService:
             CLOUDINARY_SECURE_URL: response[CLOUDINARY_SECURE_URL],
             CLOUDINARY_PUBLIC_ID: response[CLOUDINARY_PUBLIC_ID],
         }
+
+    def move_image(self, public_id, *new_folder):
+        """Move image to folder."""
+        return cloudinary.api.update(
+            public_id,
+            asset_folder=os.path.join(*new_folder),
+        )
+
+    def delete_image(self, image_dict):
+        """Delete image."""
+        cloudinary.api.delete_resources(
+            image_dict.get(ORIGIN_IMAGE).get(CLOUDINARY_PUBLIC_ID)
+        )
+        cloudinary.api.delete_resources(
+            image_dict.get(SEGMENTATION_IMAGE).get(CLOUDINARY_PUBLIC_ID)
+        )

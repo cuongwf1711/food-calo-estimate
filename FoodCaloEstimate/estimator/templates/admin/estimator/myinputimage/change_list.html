@@ -1,0 +1,192 @@
+{% extends "admin/change_list.html" %}
+{% load static %}
+
+{% block content_title %}{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.min.js"></script>
+
+<style>
+.my-chart-container canvas {
+    width: 100% !important;
+    height: 80vh !important;
+}
+.my-button-group {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 10px;
+}
+
+.my-button-group button {
+    flex: 1 1 auto;
+    padding: .5em 1em;
+    border: 1px solid #ccc;
+    background: #f5f5f5;
+    cursor: pointer;
+    transition: background .2s;
+}
+
+.my-button-group button:hover {
+    background: #e1e1e1;
+}
+
+.my-button-group button.active {
+    background: #28a745;
+    color: #fff;
+    border-color: #248a3a;
+}
+
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', async () => {
+        const ctx = document.getElementById('myChart').getContext('2d');
+        const display_format = 'DD/MM/YYYY';
+        const BASE = '/adminestimator/myinputimage';
+
+        const fetchInitialData = async () => {
+            const response = await fetch(`${BASE}/chart_data_date`);
+            const result_json = await response.json();
+            return result_json.map(d => ({ ...d, x: new Date(d.date) }));
+        };
+
+        const initialData = await fetchInitialData();
+
+        const maxTicks = 20;
+        const colorColumn = 'rgba(8, 126, 33, 0.5)';
+        const globalTimeConfig = {
+            unit: 'day',
+            round: 'day',
+            displayFormats: {
+                day: display_format,
+            },
+        };
+        const globalyAxesConfig = {
+            beginAtZero: true,
+            maxTicksLimit: maxTicks,
+        };
+        const chart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                datasets: [
+                    {
+                        label: 'images',
+                        data: initialData,
+                        backgroundColor: colorColumn,
+                    },
+                ],
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    xAxes: [
+                        {
+                            type: 'time',
+                            time: globalTimeConfig,
+                        },
+                    ],
+                    yAxes: [
+                        {
+                            ticks: globalyAxesConfig,
+                        },
+                    ],
+                },
+            },
+        });
+
+        const buttons = [
+            {id: 'date', url: `${BASE}/chart_data_date`, xType: 'time'},
+            { id: 'label_type', url: `${BASE}/chart_data_label_type`, xType: 'category' },
+            { id: 'predict_type', url: `${BASE}/chart_data_predict_type`, xType: 'category' },
+            { id: 'user', url: `${BASE}/chart_data_user`, xType: 'category' },
+            { id: 'staff', url: `${BASE}/chart_data_staff`, xType: 'category' },
+
+            {
+                id: 'calories',
+                url: `${BASE}/chart_data_calories`,
+                xType: 'time',
+                label: 'calories'
+            },
+
+            {
+                id: 'dataProcessed',
+                url: `${BASE}/chart_data_processed`,
+                xType: 'category',
+            },
+
+            {
+                id: 'accuracy',
+                url: `${BASE}/chart_data_accuracy`,
+                xType: 'category',
+            },
+        ];
+
+        const updateChart = async (config) => {
+            const { url, xType, yConfig, timeConfig = globalTimeConfig, label = 'images' } = config;
+
+            try {
+                chart.data.datasets[0].data = [];
+                chart.update();
+
+                const res = await fetch(url);
+                const json = await res.json();
+                chart.data.datasets[0].data = json.map(d => ({ ...d, x: d.date ? new Date(d.date) : d.x }));
+
+                chart.options.scales.xAxes[0].type = xType;
+                if (xType === 'time') chart.options.scales.xAxes[0].time = timeConfig;
+                if (xType === 'category') chart.options.scales.xAxes[0].labels = json.map(d => d.x);
+
+                chart.options.scales.yAxes[0].ticks = { ...globalyAxesConfig, ...yConfig };
+                chart.data.datasets[0].label = label;
+
+                chart.update();
+            } catch (error) {
+                console.error('Error updating chart:', error);
+            }
+        };
+
+        const btns = document.querySelectorAll('.my-button-group button');
+        if (btns.length) btns[0].classList.add('active');
+        btns.forEach(btn =>
+            btn.addEventListener('click', () => {
+                btns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            })
+        );
+
+
+        buttons.forEach(button => {
+            document.getElementById(button.id).addEventListener('click', () => updateChart(button));
+        });
+    });
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="my-chart-container">
+    <div>
+        <canvas id="myChart"></canvas>
+    </div>
+
+    <div class="my-button-group">
+        <button id="date">Date</button>
+        <button id="label_type">Label</button>
+        <button id="predict_type">Predict</button>
+        <button id="user">User</button>
+        <button id="staff">Staff</button>
+        <button id="calories">Calories</button>
+        <button id="dataProcessed">Data Processed</button>
+        <button id="accuracy">Accuracy</button>
+    </div>
+</div>
+<h1>
+    <a href="https://console.cloudinary.com/console/c-86e4ec4d82f750bc26b637750b6545/media_library/folders/home?view_mode=mosaic"
+        target="_blank">MANAGE DATASET</a>
+</h1>
+{{ block.super }}
+{% endblock %}

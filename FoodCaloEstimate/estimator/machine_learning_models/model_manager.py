@@ -18,6 +18,8 @@ from FoodCaloEstimate.estimator.machine_learning_models.classification_model imp
 from FoodCaloEstimate.estimator.machine_learning_models.segmentation_model import (
     SegmentationModel,
 )
+from FoodCaloEstimate.estimator.utils.clear_data import clear_data
+
 
 
 class ModelManager:
@@ -30,33 +32,24 @@ class ModelManager:
     def initialize_models(cls):
         """Khởi tạo tất cả models"""
         if not cls._initialized:
-            # ConvNextV2_Model =  ClassificationModel(
-            #     MACHINE_LEARNING_MODELS[ConvNextV2]["model_name"],
-            #     MACHINE_LEARNING_MODELS[ConvNextV2]["checkpoint_path"]
-            # )
-            EfficientNetV2_Model = ClassificationModel(
-                MACHINE_LEARNING_MODELS[EfficientNetV2]["model_name"],
-                MACHINE_LEARNING_MODELS[EfficientNetV2]["checkpoint_path"],
-            )
-            # SwinTransformerV2_Model = ClassificationModel(
-            #     MACHINE_LEARNING_MODELS[SwinTransformerV2]["model_name"],
-            #     MACHINE_LEARNING_MODELS[SwinTransformerV2]["checkpoint_path"]
-            # )
-            Segmentation_Model = SegmentationModel()
-            # cls._models[ConvNextV2] = ConvNextV2_Model
-            cls._models[EfficientNetV2] = EfficientNetV2_Model
-            # cls._models[SwinTransformerV2] = SwinTransformerV2_Model
-            cls._models[SegmentationModel_Key] = Segmentation_Model
-            # Thêm các model khác nếu cần
+            clear_data()
+            models = [EfficientNetV2] # , ConvNextV2, SwinTransformerV2
+            for model in models:
+                cls._models[model] = ClassificationModel(
+                    MACHINE_LEARNING_MODELS[model]["model_name"],
+                    MACHINE_LEARNING_MODELS[model]["checkpoint_path"],
+                )
+
+            cls._models[SegmentationModel_Key] = SegmentationModel()
 
             cls._initialized = True
 
     @classmethod
-    def get_model(cls, model_name):
+    def get_model(cls, model_name=None):
         """Get model by name."""
         if not cls._initialized:
             raise RuntimeError(
                 "Models have not been initialized. Call initialize_models() first."
             )
 
-        return cls._models.get(model_name, EfficientNetV2)
+        return cls._models.get(model_name, cls._models[EfficientNetV2])

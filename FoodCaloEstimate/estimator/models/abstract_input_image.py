@@ -9,20 +9,18 @@ from django.contrib.auth import get_user_model
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
+from FoodCaloEstimate.estimator.constants.image_constants import UNKNOWN_INDEX
 from FoodCaloEstimate.iam.constants.django_model_constant import MAX_LENGTH_CHAR_FIELD
 from FoodCaloEstimate.iam.models.base_model import AutoTimeStampedModel, UUIDModel
 
 User = get_user_model()
 
-DEFAULT_UNKNOWN_LABEL = -1
-
-
 class AbstractInputImage(AutoTimeStampedModel, UUIDModel):
     """Abstract Input Image."""
 
     url = models.JSONField()
-    label = models.IntegerField(default=DEFAULT_UNKNOWN_LABEL)
-    predict = models.IntegerField(default=DEFAULT_UNKNOWN_LABEL)
+    label = models.IntegerField(default=UNKNOWN_INDEX)
+    predict = models.IntegerField(default=UNKNOWN_INDEX)
     confidence = models.FloatField(
         validators=[MinValueValidator(0.0), MaxValueValidator(1.0)]
     )
@@ -33,6 +31,10 @@ class AbstractInputImage(AutoTimeStampedModel, UUIDModel):
         User, on_delete=models.CASCADE, related_name="labeled_images", null=True
     )
     comment = models.CharField(max_length=MAX_LENGTH_CHAR_FIELD, blank=True)
+
+    def __str__(self):
+        """String representation of the model."""
+        return str(self.id)
 
     @property
     def confidence_percentage(self):

@@ -8,13 +8,15 @@
 import re
 import unicodedata
 
+from FoodCaloEstimate.estimator.constants.image_constants import UNKNOWN, UNKNOWN_CALO, UNKNOWN_INDEX
+
 
 class FoodDictionaryService:
     """Food Dictionary Class."""
 
     def __init__(self):
         """Init."""
-        self.foods = (
+        self.__foods = (
             ("bánh cuốn", 140),
             ("mì quảng", 450),
             ("bánh tráng nướng", 250),
@@ -54,22 +56,33 @@ class FoodDictionaryService:
             ("hủ tiếu", 320),
         )
 
-        self.food_data = {}
-        self.id_to_food = {}
+        self.food_data = {
+            UNKNOWN: {
+                "id": UNKNOWN_INDEX,
+                "calories": UNKNOWN_CALO,
+                "name_accent": UNKNOWN,
+            }
+        }
+        self.id_to_food = {
+            UNKNOWN_INDEX: {
+                "calories": UNKNOWN_CALO,
+                "name_accent": UNKNOWN,
+                "name_no_accent": UNKNOWN,
+            }
+        }
 
-        # Xử lý và tạo các dictionary cho truy xuất nhanh
-        for food_id, (name_accent, calories) in enumerate(self.foods):
+        for food_id, (name_accent, calories) in enumerate(self.__foods):
             name_no_accent = self._remove_accents(name_accent)
             data_food_general = {"calories": calories}
 
             self.food_data[name_no_accent] = {
                 **data_food_general,
                 "id": food_id,
-                "name": name_accent,
+                "name_accent": name_accent,
             }
             self.id_to_food[food_id] = {
                 **data_food_general,
-                "name": name_accent,
+                "name_accent": name_accent,
                 "name_no_accent": name_no_accent,
             }
 
@@ -98,7 +111,7 @@ class FoodDictionaryService:
             return food["calories"]
         return None
 
-    def get_name(self, identifier, with_accent=True):
+    def get_name(self, identifier, remove_accents=False):
         """Get name by ID or name."""
         if isinstance(identifier, int):
             food = self._get_by_id(identifier)
@@ -106,22 +119,8 @@ class FoodDictionaryService:
             food = self._get_by_name(identifier)
 
         if food:
-            return food["name"] if with_accent else food.get("name_no_accent")
-        return None
-
-    def _get_all_foods(self):
-        """Get all foods."""
-        return [
-            {"id": index, "name": food_name, "calories": calories}
-            for index, (food_name, calories) in enumerate(self.foods)
-        ]
-
-    def get_id(self, name):
-        """Get ID by name."""
-        food = self._get_by_name(name)
-        if food:
-            return food["id"]
-        return None
+            return food["name_accent"] if not remove_accents else food.get("name_no_accent")
+        return UNKNOWN
 
 
 FoodDictionary = FoodDictionaryService()

@@ -31,6 +31,9 @@ SAM2_CONFIG = "configs/sam2.1/sam2.1_hiera_l.yaml"
 GROUNDING_DINO_MODEL = "IDEA-Research/grounding-dino-base"
 SegmentationModel_Key = "SegmentationModel"
 
+BOX_THRESHHOLD=0.4
+TEXT_THRESHHOLD=0.3
+
 # Machine Learning Models
 MACHINE_LEARNING_MODELS = {
     "ConvNextV2": {

@@ -4,3 +4,4 @@
 # email: ruivalien@gmail.com
 
 TIMEOUT_SERVER = 60 * 2  # 2 minute
+AUTHOR = "cuongwf1711"
