@@ -7,11 +7,18 @@
 
 import numpy as np
 import torch
+# from django.conf import settings
 from PIL import Image
 from sam2.build_sam import build_sam2
 from sam2.sam2_image_predictor import SAM2ImagePredictor
 from torch import autocast
 from transformers import AutoModelForZeroShotObjectDetection, AutoProcessor
+# from transformers.models.auto.processing_auto import AutoProcessor
+# from transformers.models.auto.modeling_auto import AutoModelForZeroShotObjectDetection
+
+# from dds_cloudapi_sdk import Config
+# from dds_cloudapi_sdk import Client
+# from dds_cloudapi_sdk.tasks.v2_task import V2Task
 
 from FoodCaloEstimate.estimator.constants.machine_learning_constants import (
     DEVICE,
@@ -34,18 +41,19 @@ class SegmentationModel:
 
     def __init__(self):
         """Init."""
-        torch.backends.cuda.matmul.allow_tf32 = True
-        torch.backends.cudnn.allow_tf32 = True
+        if torch.backends.cuda.is_built() and torch.cuda.is_available():
+            torch.backends.cuda.matmul.allow_tf32 = True
+            torch.backends.cudnn.allow_tf32 = True
 
         self.processor = AutoProcessor.from_pretrained(GROUNDING_DINO_MODEL)
         self.grounding_model = AutoModelForZeroShotObjectDetection.from_pretrained(
             GROUNDING_DINO_MODEL
-        ).to(DEVICE).eval()
+        ).eval().to(DEVICE)
 
         self.sam2_model = build_sam2(SAM2_CONFIG, SAM2_CHECKPOINT, device=DEVICE)
         self.sam2_predictor = SAM2ImagePredictor(self.sam2_model)
 
-    def _get_boxes(self, image):
+    def _get_boxes_groundino(self, image):
         """Get boxes."""
         inputs = self.processor(images=image, text=TEXT_PROMPT, return_tensors="pt").to(
             DEVICE
@@ -61,7 +69,7 @@ class SegmentationModel:
             target_sizes=[image.size[::-1]],
         )
         clear_data(inputs, outputs)
-        return results
+        return results[0]["boxes"].cpu().numpy(), results[0]["text_labels"]
 
     def _get_masks(self, image, input_boxes):
         """Get masks."""
@@ -80,9 +88,8 @@ class SegmentationModel:
     def get_area_food_from_text_prompt(self, input_image):
         """Get area food from text prompt."""
         with Image.open(input_image) as image:
-            results = self._get_boxes(image)
-            all_masks = self._get_masks(image, results[0]["boxes"].cpu().numpy())
-            text_labels = results[0]["text_labels"]
+            input_boxes, text_labels = self._get_boxes_groundino(image)
+            all_masks = self._get_masks(image, input_boxes)
 
         final_masks = []
         category_areas = {category: 0 for category in TEXT_PROMPT}
@@ -94,3 +101,39 @@ class SegmentationModel:
         overlay = MachineLearningService.get_overlay_image(image, final_masks, text_labels)
         clear_data(all_masks,final_masks)
         return overlay, category_areas.values()
+
+    # def _get_boxes_dinox(self, image):
+    #     """Get boxes use dinox."""
+    #     client = Client(Config(settings))
+
+    #     BOX_THRESHOLD = 0.2
+    #     IOU_THRESHOLD = 0.8
+    #     infer_image_url = client.upload_file(image)
+
+    #     task = V2Task(
+    #         api_path="/v2/task/dinox/detection",
+    #         api_body={
+    #             "model": "DINO-X-1.0",
+    #             "image": infer_image_url,
+    #             "prompt": {
+    #                 "type": "text",
+    #                 "text": ".".join(TEXT_PROMPT),
+    #             },
+    #             "targets": ["bbox", "mask"],
+    #             "bbox_threshold": BOX_THRESHOLD,
+    #             "iou_threshold": IOU_THRESHOLD,
+    #         }
+    #     )
+
+    #     client.run_task(task)
+    #     objects = task.result["objects"]
+
+
+    #     input_boxes = []
+    #     text_labels = []
+
+    #     for obj in objects:
+    #         input_boxes.append(obj["bbox"])
+    #         text_labels.append(obj["category"])
+
+    #     return np.array(input_boxes), text_labels

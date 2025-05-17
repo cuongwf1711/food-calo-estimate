@@ -16,11 +16,8 @@ def clear_data(*variables):
         except NameError:
             pass
 
-    # Clear CUDA cache
-    torch.cuda.empty_cache()
-
-    # Clear PyTorch cache
-    torch.cuda.ipc_collect()
-
-    # Clear Python garbage collector
     gc.collect()
+
+    if torch.cuda.is_available():
+        torch.cuda.empty_cache()
+        torch.cuda.ipc_collect()
