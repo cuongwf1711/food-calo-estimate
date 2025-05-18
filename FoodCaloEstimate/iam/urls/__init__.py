@@ -5,7 +5,6 @@
 
 """Init."""
 
-from django.urls import path, include
 
 from FoodCaloEstimate.iam.urls.auth_urls import urlpatterns as auth_urls
 

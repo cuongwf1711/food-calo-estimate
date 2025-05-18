@@ -9,17 +9,13 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import make_password
 from rest_framework import serializers
 
-from FoodCaloEstimate.iam.constants.auth_constants import OTP_DB_REDIS
 from FoodCaloEstimate.iam.constants.django_model_constant import MAX_LENGTH_CHAR_FIELD
-from FoodCaloEstimate.iam.services.redis_services import RedisService
 from FoodCaloEstimate.iam.utils.otp_utils import (
     check_valid_client_otp_or_raise_exception,
 )
 from FoodCaloEstimate.iam.utils.password_validator import password_validator
 from FoodCaloEstimate.messages.iam_messages import (
     EXISTED_ACOUNT,
-    OTP_EXPIRED,
-    OTP_INVALID,
 )
 
 User = get_user_model()

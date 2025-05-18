@@ -5,11 +5,13 @@
 
 """Custom Decorator."""
 
-from functools import wraps
 import time
+from functools import wraps
+
 
 def time_measure(func):
     """Decorator to measure the execution time of a function."""
+
     @wraps(func)
     def wrapper(*args, **kwargs):
         """Wrapper function."""
@@ -18,4 +20,5 @@ def time_measure(func):
         duration = time.time() - start
         print(f"[TIMING] {func.__name__} took {duration:.4f}s")
         return result
+
     return wrapper

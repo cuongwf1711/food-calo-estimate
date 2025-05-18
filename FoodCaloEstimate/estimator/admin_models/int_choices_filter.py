@@ -8,12 +8,15 @@
 
 from django.contrib.admin import SimpleListFilter
 
-from FoodCaloEstimate.estimator.constants.admin_model_constants import TEMPLATE_DROPDOWN_FILTER
+from FoodCaloEstimate.estimator.constants.admin_model_constants import (
+    TEMPLATE_DROPDOWN_FILTER,
+)
 from FoodCaloEstimate.estimator.services.food_dictionany_service import FoodDictionary
 
 
 def make_int_choice_filter(field_name, title_text):
     """Make Int Choice Filter."""
+
     class IntChoiceFilter(SimpleListFilter):
         """Int Choice Filter."""
 
@@ -24,14 +27,11 @@ def make_int_choice_filter(field_name, title_text):
         def lookups(self, request, model_admin):
             """Lookups for the filter."""
             present = set(
-                model_admin
-                .get_queryset(request)
-                .values_list(field_name, flat=True)
+                model_admin.get_queryset(request).values_list(field_name, flat=True)
             )
 
             return [
-                (str(food_id), FoodDictionary.get_name(food_id))
-                for food_id in present
+                (str(food_id), FoodDictionary.get_name(food_id)) for food_id in present
             ]
 
         def queryset(self, request, queryset):

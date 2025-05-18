@@ -40,7 +40,8 @@ class MachineLearningService:
         """Get overlay image."""
         result_image = image.copy()
         SEGMENTATION_COLORS = {
-            label: np.concatenate([np.random.random(3), [0.6]]) for label in TEXT_PROMPT_LIST
+            label: np.concatenate([np.random.random(3), [0.6]])
+            for label in TEXT_PROMPT_LIST
         }
         for mask, label in zip(masks, labels):
             color_array = (np.array(SEGMENTATION_COLORS[label][:3]) * 255).astype(

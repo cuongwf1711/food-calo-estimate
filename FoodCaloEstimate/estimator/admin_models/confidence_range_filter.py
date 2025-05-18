@@ -7,7 +7,9 @@
 
 from django.contrib.admin import SimpleListFilter
 
-from FoodCaloEstimate.estimator.constants.admin_model_constants import TEMPLATE_DROPDOWN_FILTER
+from FoodCaloEstimate.estimator.constants.admin_model_constants import (
+    TEMPLATE_DROPDOWN_FILTER,
+)
 
 
 class ConfidenceRangeFilter(SimpleListFilter):

@@ -7,10 +7,10 @@
 
 from FoodCaloEstimate.estimator.constants.machine_learning_constants import (
     MACHINE_LEARNING_MODELS,
-    ConvNextV2,
+    # ConvNextV2,
     EfficientNetV2,
     SegmentationModel_Key,
-    SwinTransformerV2,
+    # SwinTransformerV2,
 )
 from FoodCaloEstimate.estimator.machine_learning_models.classification_model import (
     ClassificationModel,
@@ -19,7 +19,6 @@ from FoodCaloEstimate.estimator.machine_learning_models.segmentation_model impor
     SegmentationModel,
 )
 from FoodCaloEstimate.estimator.utils.clear_data import clear_data
-
 
 
 class ModelManager:
@@ -34,7 +33,7 @@ class ModelManager:
         if not cls._initialized:
             cls._force_cleanup()
 
-            models = [EfficientNetV2] # , ConvNextV2, SwinTransformerV2
+            models = [EfficientNetV2]  # , ConvNextV2, SwinTransformerV2
             for model in models:
                 cls._models[model] = ClassificationModel(
                     MACHINE_LEARNING_MODELS[model]["model_name"],
@@ -67,9 +66,9 @@ class ModelManager:
     def _force_cleanup(cls):
         """Force cleanup of all models."""
         for my_model in cls._models.values():
-            if hasattr(my_model, 'model'):
+            if hasattr(my_model, "model"):
                 del my_model.model
-            if hasattr(my_model, 'sam2_predictor'):
+            if hasattr(my_model, "sam2_predictor"):
                 my_model.sam2_predictor.reset_predictor()
                 del my_model.sam2_predictor
             del my_model

@@ -5,9 +5,11 @@
 
 """Clear Data."""
 
+
 def clear_data(*variables):
     """Clear data."""
     import gc
+
     import torch
 
     for t in variables:

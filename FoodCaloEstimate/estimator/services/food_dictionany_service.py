@@ -8,7 +8,11 @@
 import re
 import unicodedata
 
-from FoodCaloEstimate.estimator.constants.image_constants import UNKNOWN, UNKNOWN_CALO, UNKNOWN_INDEX
+from FoodCaloEstimate.estimator.constants.image_constants import (
+    UNKNOWN,
+    UNKNOWN_CALO,
+    UNKNOWN_INDEX,
+)
 
 
 class FoodDictionaryService:
@@ -119,7 +123,11 @@ class FoodDictionaryService:
             food = self._get_by_name(identifier)
 
         if food:
-            return food["name_accent"] if not remove_accents else food.get("name_no_accent")
+            return (
+                food["name_accent"]
+                if not remove_accents
+                else food.get("name_no_accent")
+            )
         return UNKNOWN
 
 

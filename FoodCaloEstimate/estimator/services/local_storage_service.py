@@ -11,7 +11,9 @@ from FoodCaloEstimate.estimator.constants.image_constants import (
     ORIGIN_IMAGE,
     SEGMENTATION_IMAGE,
 )
-from FoodCaloEstimate.estimator.utils.generate_unique_filename import generate_unique_filename
+from FoodCaloEstimate.estimator.utils.generate_unique_filename import (
+    generate_unique_filename,
+)
 
 
 class LocalStorageService:

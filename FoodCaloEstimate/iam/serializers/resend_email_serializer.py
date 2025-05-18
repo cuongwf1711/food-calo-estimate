@@ -12,7 +12,6 @@ from FoodCaloEstimate.iam.constants.django_model_constant import MAX_LENGTH_CHAR
 from FoodCaloEstimate.iam.utils.otp_utils import set_otp_to_redis_or_raise_exception
 from FoodCaloEstimate.iam.utils.send_email_signup import send_email_signup
 from FoodCaloEstimate.iam.utils.user_utils import get_valid_user_or_raise_exeption
-from FoodCaloEstimate.messages.iam_messages import ACCOUNT_NOT_EXIST, INACTIVE_ACCOUNT
 
 User = get_user_model()
 

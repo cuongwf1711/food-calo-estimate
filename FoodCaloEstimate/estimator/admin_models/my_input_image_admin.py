@@ -7,14 +7,23 @@
 
 from django.utils.html import format_html
 
-from FoodCaloEstimate.estimator.admin_models.confidence_range_filter import ConfidenceRangeFilter
-from FoodCaloEstimate.estimator.admin_models.int_choices_filter import make_int_choice_filter
+from FoodCaloEstimate.estimator.admin_models.chart_admin_model import ChartAdminModel
+from FoodCaloEstimate.estimator.admin_models.confidence_range_filter import (
+    ConfidenceRangeFilter,
+)
+from FoodCaloEstimate.estimator.admin_models.int_choices_filter import (
+    make_int_choice_filter,
+)
 from FoodCaloEstimate.estimator.admin_models.my_input_image_form import MyInputImageForm
-from FoodCaloEstimate.estimator.constants.image_constants import DEFAULT_URL, LOCAL_IMAGE_URL, ORIGIN_IMAGE, SEGMENTATION_IMAGE
+from FoodCaloEstimate.estimator.constants.image_constants import (
+    DEFAULT_URL,
+    ORIGIN_IMAGE,
+    SEGMENTATION_IMAGE,
+)
 from FoodCaloEstimate.estimator.services.food_dictionany_service import FoodDictionary
 from FoodCaloEstimate.estimator.services.image_service import ImageService
 from FoodCaloEstimate.queue_tasks import run_task_in_queue
-from FoodCaloEstimate.estimator.admin_models.chart_admin_model import ChartAdminModel
+
 
 class MyInputImageAdmin(ChartAdminModel):
     """My Input Image Admin."""
@@ -33,8 +42,7 @@ class MyInputImageAdmin(ChartAdminModel):
         """Render image."""
         url = obj.url.get(image_type, {}).get(DEFAULT_URL, "")
         return format_html(
-            '<img src="{}" style="width:100%; height:auto; object-fit:contain;"/>',
-            url
+            '<img src="{}" style="width:100%; height:auto; object-fit:contain;"/>', url
         )
 
     def origin_and_segmentation_images(self, obj):
@@ -43,7 +51,7 @@ class MyInputImageAdmin(ChartAdminModel):
             '<div style="display:flex; gap:1rem; flex-wrap:wrap;">'
             '  <div style="flex:1 1 45%;">{}</div>'
             '  <div style="flex:1 1 45%;">{}</div>'
-            '</div>',
+            "</div>",
             self.render_image(obj, ORIGIN_IMAGE),
             self.render_image(obj, SEGMENTATION_IMAGE),
         )
@@ -73,7 +81,7 @@ class MyInputImageAdmin(ChartAdminModel):
         "origin_and_segmentation_images",
     ]
     list_filter = (
-        make_int_choice_filter("label",   "Label"),
+        make_int_choice_filter("label", "Label"),
         make_int_choice_filter("predict", "Prediction"),
         ConfidenceRangeFilter,
         "created_at",
@@ -87,10 +95,7 @@ class MyInputImageAdmin(ChartAdminModel):
 
     def save_model(self, request, obj, form, change):
         """Save model."""
-        run_task_in_queue(
-            ImageService.move_image_and_update_instance,
-            obj
-        )
+        run_task_in_queue(ImageService.move_image_and_update_instance, obj)
         obj.staff = request.user
         obj.save(update_fields=["label", "updated_at", "staff"])
 

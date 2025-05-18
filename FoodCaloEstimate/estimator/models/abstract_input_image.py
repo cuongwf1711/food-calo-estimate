@@ -15,6 +15,7 @@ from FoodCaloEstimate.iam.models.base_model import AutoTimeStampedModel, UUIDMod
 
 User = get_user_model()
 
+
 class AbstractInputImage(AutoTimeStampedModel, UUIDModel):
     """Abstract Input Image."""
 

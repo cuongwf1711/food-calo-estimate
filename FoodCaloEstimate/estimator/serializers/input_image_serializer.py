@@ -25,7 +25,6 @@ from FoodCaloEstimate.estimator.machine_learning_models.model_manager import (
 from FoodCaloEstimate.estimator.models.my_input_image import MyInputImage
 from FoodCaloEstimate.estimator.services.food_dictionany_service import FoodDictionary
 from FoodCaloEstimate.estimator.services.image_service import ImageService
-
 from FoodCaloEstimate.estimator.services.machine_leaning_service import (
     MachineLearningService,
 )
@@ -76,7 +75,6 @@ class InputImageSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Comment is not allowed.")
         return value
 
-
     def validate_image_file(self, image):
         """Validate method."""
         if image.size > MAX_IMAGE_SIZE:
@@ -102,41 +100,45 @@ class InputImageSerializer(serializers.ModelSerializer):
         # }
         # return super().create(validated_data)
 
-
-
         image_file = validated_data["image_file"]
         validated_data.clear()
 
-        validated_data["confidence"], \
-        validated_data["predict"] = ModelManager.get_model(
-                                            ).predict(image_file)
+        (
+            validated_data["confidence"],
+            validated_data["predict"],
+        ) = ModelManager.get_model().predict(image_file)
 
-        segmentation_image_byteio, \
-        (food_pixel_area, \
-        reference_point_pixel_area) = ModelManager.get_model(
+        segmentation_image_byteio, (
+            food_pixel_area,
+            reference_point_pixel_area,
+        ) = ModelManager.get_model(
             SegmentationModel_Key
-        ).get_area_food_from_text_prompt(image_file)
+        ).get_area_food_from_text_prompt(
+            image_file
+        )
 
         image_file.seek(0)
         image_byteio = io.BytesIO(image_file.read())
 
-        (origin_image_cloudinary, origin_image_local), \
-        (segmentation_image_cloudinary, segmentation_image_local), \
-        validated_data["calo"] = run_parallel_tasks_in_queue(
-            (
-                ImageService.upload_image,
-                (image_byteio, ORIGIN_IMAGE, UNKNOWN),
-                {}
-            ),
+        (
+            (origin_image_cloudinary, origin_image_local),
+            (segmentation_image_cloudinary, segmentation_image_local),
+            validated_data["calo"],
+        ) = run_parallel_tasks_in_queue(
+            (ImageService.upload_image, (image_byteio, ORIGIN_IMAGE, UNKNOWN), {}),
             (
                 ImageService.upload_image,
                 (segmentation_image_byteio, SEGMENTATION_IMAGE, UNKNOWN),
-                {}
+                {},
             ),
             (
                 MachineLearningService.calculate_calories,
-                (validated_data["predict"], food_pixel_area, reference_point_pixel_area),
-                {}
+                (
+                    validated_data["predict"],
+                    food_pixel_area,
+                    reference_point_pixel_area,
+                ),
+                {},
             ),
         )
         image_byteio.close()
@@ -169,6 +171,7 @@ def test1(a, b, c):
     """Test function."""
     print(a, b, c)
     return a + b + c
+
 
 # run_parallel_tasks_in_queue(
 #     (test1, (1, 2, 3), {}),

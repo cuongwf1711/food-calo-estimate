@@ -1,6 +1,8 @@
 from django.apps import AppConfig
 
-from FoodCaloEstimate.estimator.machine_learning_models.model_manager import ModelManager
+from FoodCaloEstimate.estimator.machine_learning_models.model_manager import (
+    ModelManager,
+)
 
 
 class EstimatorConfig(AppConfig):
@@ -10,4 +12,5 @@ class EstimatorConfig(AppConfig):
     def ready(self):
         """Ready."""
         import atexit
+
         atexit.register(ModelManager.release_models)

@@ -5,8 +5,8 @@
 
 """Generate Unique Filename."""
 
-from datetime import datetime
 import uuid
+from datetime import datetime
 
 from FoodCaloEstimate.estimator.constants.image_constants import FORMAT_IMAGE
 

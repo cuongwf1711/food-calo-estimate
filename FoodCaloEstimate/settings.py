@@ -49,7 +49,7 @@ INSTALLED_APPS = [
     "drf_spectacular",
     "nplusone.ext.django",
     "django_filters",
-    'django_admin_listfilter_dropdown',
+    "django_admin_listfilter_dropdown",
 ]
 
 MIDDLEWARE = [

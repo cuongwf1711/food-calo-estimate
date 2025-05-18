@@ -6,21 +6,21 @@
 """Chart Admin Model."""
 
 from django.contrib.admin import ModelAdmin
-from django.urls import path
-from django.db.models import Count, Sum, Q, F
+from django.db.models import Count, F, Q, Sum
 from django.db.models.functions import TruncDay
-
 from django.http import JsonResponse
-
-
+from django.urls import path
 
 from FoodCaloEstimate.estimator.models.my_input_image import MyInputImage
 from FoodCaloEstimate.estimator.services.food_dictionany_service import FoodDictionary
 
+
 class ChartAdminModel(ModelAdmin):
     """Chart Admin Model."""
 
-    all_labels = {id: name["name_accent"] for id, name in FoodDictionary.id_to_food.items()}
+    all_labels = {
+        id: name["name_accent"] for id, name in FoodDictionary.id_to_food.items()
+    }
     model = MyInputImage
 
     def get_urls(self):
@@ -92,39 +92,40 @@ class ChartAdminModel(ModelAdmin):
         """Chart data grouped by staff."""
         return self.get_data_from_user("staff__username")
 
-
     def chart_data_processed_endpoint(self, request):
         """Chart data processed by staff."""
         counts = self.model.objects.aggregate(
-            unprocessed=Count('id', filter=Q(staff__isnull=True)),
-            processed  =Count('id', filter=Q(staff__isnull=False))
+            unprocessed=Count("id", filter=Q(staff__isnull=True)),
+            processed=Count("id", filter=Q(staff__isnull=False)),
         )
         data = [
             {"x": "unprocessed", "y": counts["unprocessed"]},
-            {"x": "processed",   "y": counts["processed"]},
+            {"x": "processed", "y": counts["processed"]},
         ]
         return JsonResponse(data, safe=False)
 
     def chart_data_accuracy_endpoint(self, request):
         """Chart data accuracy."""
         stats = self.model.objects.aggregate(
-            unprocessed_count=Count('id', filter=Q(staff__isnull=True)),
-            processed_count=  Count('id', filter=Q(staff__isnull=False)),
+            unprocessed_count=Count("id", filter=Q(staff__isnull=True)),
+            processed_count=Count("id", filter=Q(staff__isnull=False)),
             correct_predictions=Count(
-                'id',
-                filter=Q(staff__isnull=False) & Q(label=F('predict'))
+                "id", filter=Q(staff__isnull=False) & Q(label=F("predict"))
             ),
         )
 
-        unprocessed = stats['unprocessed_count'] or 0
-        processed   = stats['processed_count']   or 0
-        correct     = stats['correct_predictions'] or 0
+        unprocessed = stats["unprocessed_count"] or 0
+        processed = stats["processed_count"] or 0
+        correct = stats["correct_predictions"] or 0
 
         accuracy_percentage = (correct / processed * 100) if processed else 0.0
         processed_ratio_pct = (processed / unprocessed * 100) if unprocessed else 0.0
 
         response_data = [
             {"x": "Accuracy (%)", "y": float(f"{accuracy_percentage:.2f}")},
-            {"x": "Processed/Unprocessed (%)", "y": float(f"{processed_ratio_pct:.2f}")},
+            {
+                "x": "Processed/Unprocessed (%)",
+                "y": float(f"{processed_ratio_pct:.2f}"),
+            },
         ]
         return JsonResponse(response_data, safe=False)

@@ -7,7 +7,7 @@
 
 from django.db import connection, transaction
 from django.http.response import Http404
-from rest_framework import exceptions, status
+from rest_framework import exceptions
 from rest_framework.response import Response
 from rest_framework.views import exception_handler
 
