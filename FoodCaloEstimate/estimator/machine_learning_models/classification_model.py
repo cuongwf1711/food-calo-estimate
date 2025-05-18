@@ -18,6 +18,7 @@ from FoodCaloEstimate.estimator.constants.my_food_calo_estimate_constants import
     NUM_CLASSES,
 )
 from FoodCaloEstimate.estimator.utils.clear_data import clear_data
+from FoodCaloEstimate.estimator.utils.custom_decorator import time_measure
 
 
 class ClassificationModel:
@@ -41,6 +42,7 @@ class ClassificationModel:
             **data_config, is_training=False
         )
 
+    @time_measure
     @torch.inference_mode()
     def predict(
         self,

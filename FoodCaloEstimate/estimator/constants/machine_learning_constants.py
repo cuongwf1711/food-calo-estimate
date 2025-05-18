@@ -27,8 +27,9 @@ TEXT_PROMPT_LIST = ["food"]
 TEXT_PROMPT_LIST.append(REFERENCE_POINT)
 TEXT_PROMPT = ".".join(TEXT_PROMPT_LIST)
 
-SAM2_CHECKPOINT = rf"{settings.BASE_DIR}/FoodCaloEstimate/estimator/weights/sam2.1_hiera_large.pt"
-SAM2_CONFIG = "configs/sam2.1/sam2.1_hiera_l.yaml"
+SAM2_VERSION = "sam2.1_hiera_t"
+SAM2_CHECKPOINT = rf"{settings.BASE_DIR}/FoodCaloEstimate/estimator/weights/{SAM2_VERSION}.pt"
+SAM2_CONFIG = rf"configs/sam2.1/{SAM2_VERSION}.yaml"  # configs/sam2.1/sam2.1_hiera_l.yaml
 GROUNDING_DINO_MODEL = "IDEA-Research/grounding-dino-tiny" # base, tiny
 DINOX_API_PATH = r"/v2/task/dinox/detection"
 DINOX_MODEL = "DINO-X-1.0"

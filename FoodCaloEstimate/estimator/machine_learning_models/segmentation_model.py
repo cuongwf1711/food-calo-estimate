@@ -105,9 +105,9 @@ class SegmentationModel:
     @torch.inference_mode()
     def get_area_food_from_text_prompt(self, input_image):
         """Get area food from text prompt."""
-        multimask_output = False
+        multimask_output = True
         with Image.open(input_image) as image:
-            input_boxes, text_labels = self._get_boxes_florence2(image)
+            input_boxes, text_labels = self._get_boxes_groundino(image)
             all_masks = self._get_masks(image, input_boxes, multimask_output)
 
         final_masks = []
