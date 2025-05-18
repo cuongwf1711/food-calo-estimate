@@ -9,6 +9,7 @@ from tempfile import NamedTemporaryFile
 
 import numpy as np
 import torch
+
 # from django.conf import settings
 from dds_cloudapi_sdk.tasks.v2_task import V2Task
 from PIL import Image
@@ -19,8 +20,6 @@ from transformers.models.auto.modeling_auto import AutoModelForZeroShotObjectDet
 
 # from transformers import AutoProcessor, AutoModelForZeroShotObjectDetection
 from transformers.models.auto.processing_auto import AutoProcessor
-# from dds_cloudapi_sdk import Config, Client
-# from dds_cloudapi_sdk.tasks.v2_task import V2Task
 
 from FoodCaloEstimate.estimator.constants.image_constants import FORMAT_IMAGE
 from FoodCaloEstimate.estimator.constants.machine_learning_constants import (
@@ -41,6 +40,10 @@ from FoodCaloEstimate.estimator.services.machine_leaning_service import (
 )
 from FoodCaloEstimate.estimator.utils.clear_data import clear_data
 from FoodCaloEstimate.estimator.utils.custom_decorator import time_measure
+
+# from dds_cloudapi_sdk import Config, Client
+# from dds_cloudapi_sdk.tasks.v2_task import V2Task
+
 
 
 class SegmentationModel:
