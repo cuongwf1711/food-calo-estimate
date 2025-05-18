@@ -25,3 +25,7 @@ LOCAL_IMAGE_URL = "local_image_url"
 CLOUDINARY_STORAGE = "cloudinary_storage"
 CLOUDINARY_PUBLIC_ID = "public_id"
 CLOUDINARY_SECURE_URL = "secure_url"
+
+
+# DEFAULT URL
+DEFAULT_URL = CLOUDINARY_SECURE_URL

@@ -32,7 +32,8 @@ class ModelManager:
     def initialize_models(cls):
         """Khởi tạo tất cả models"""
         if not cls._initialized:
-            clear_data()
+            cls._force_cleanup()
+
             models = [EfficientNetV2] # , ConvNextV2, SwinTransformerV2
             for model in models:
                 cls._models[model] = ClassificationModel(
@@ -53,3 +54,24 @@ class ModelManager:
             )
 
         return cls._models.get(model_name, cls._models[EfficientNetV2])
+
+    @classmethod
+    def release_models(cls):
+        """Release all models."""
+        if cls._initialized:
+            cls._force_cleanup()
+            del cls._models
+            del cls._initialized
+
+    @classmethod
+    def _force_cleanup(cls):
+        """Force cleanup of all models."""
+        for my_model in cls._models.values():
+            if hasattr(my_model, 'model'):
+                del my_model.model
+            if hasattr(my_model, 'sam2_predictor'):
+                my_model.sam2_predictor.reset_predictor()
+                del my_model.sam2_predictor
+            del my_model
+
+        clear_data()

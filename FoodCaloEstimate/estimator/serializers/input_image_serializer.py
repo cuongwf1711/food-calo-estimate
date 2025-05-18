@@ -10,7 +10,7 @@ import io
 from rest_framework import serializers
 
 from FoodCaloEstimate.estimator.constants.image_constants import (
-    LOCAL_IMAGE_URL,
+    DEFAULT_URL,
     MAX_IMAGE_SIZE,
     ORIGIN_IMAGE,
     SEGMENTATION_IMAGE,
@@ -29,6 +29,7 @@ from FoodCaloEstimate.estimator.services.image_service import ImageService
 from FoodCaloEstimate.estimator.services.machine_leaning_service import (
     MachineLearningService,
 )
+from FoodCaloEstimate.estimator.utils.clear_data import clear_data
 from FoodCaloEstimate.queue_tasks import run_parallel_tasks_in_queue
 
 
@@ -42,8 +43,8 @@ class InputImageSerializer(serializers.ModelSerializer):
     def get_public_url(self, obj):
         """Get public url."""
         return {
-            ORIGIN_IMAGE: obj.url[ORIGIN_IMAGE][LOCAL_IMAGE_URL],
-            SEGMENTATION_IMAGE: obj.url[SEGMENTATION_IMAGE][LOCAL_IMAGE_URL],
+            image_type: obj.url[image_type][DEFAULT_URL]
+            for image_type in (ORIGIN_IMAGE, SEGMENTATION_IMAGE)
         }
 
     def get_predict_name(self, obj):
@@ -152,7 +153,7 @@ class InputImageSerializer(serializers.ModelSerializer):
             },
         }
         validated_data["user"] = self.context["request"].user
-
+        clear_data()
         return super().create(validated_data)
 
     def update(self, instance, validated_data):

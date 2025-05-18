@@ -13,8 +13,7 @@ from PIL import Image
 from FoodCaloEstimate.estimator.constants.image_constants import FORMAT_IMAGE
 from FoodCaloEstimate.estimator.constants.machine_learning_constants import (
     REFERENCE_POINT_REAL_AREA,
-    SEGMENTATION_COLORS,
-    TEXT_PROMPT,
+    TEXT_PROMPT_LIST,
     THRESHHOLD_PIXEL_REFERENCE_POINT_AREA,
 )
 from FoodCaloEstimate.estimator.services.food_dictionany_service import FoodDictionary
@@ -40,6 +39,9 @@ class MachineLearningService:
     def get_overlay_image(image, masks, labels):
         """Get overlay image."""
         result_image = image.copy()
+        SEGMENTATION_COLORS = {
+            label: np.concatenate([np.random.random(3), [0.6]]) for label in TEXT_PROMPT_LIST
+        }
         for mask, label in zip(masks, labels):
             color_array = (np.array(SEGMENTATION_COLORS[label][:3]) * 255).astype(
                 np.uint8

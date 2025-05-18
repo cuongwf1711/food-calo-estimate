@@ -10,7 +10,7 @@ from django.utils.html import format_html
 from FoodCaloEstimate.estimator.admin_models.confidence_range_filter import ConfidenceRangeFilter
 from FoodCaloEstimate.estimator.admin_models.int_choices_filter import make_int_choice_filter
 from FoodCaloEstimate.estimator.admin_models.my_input_image_form import MyInputImageForm
-from FoodCaloEstimate.estimator.constants.image_constants import LOCAL_IMAGE_URL, ORIGIN_IMAGE, SEGMENTATION_IMAGE
+from FoodCaloEstimate.estimator.constants.image_constants import DEFAULT_URL, LOCAL_IMAGE_URL, ORIGIN_IMAGE, SEGMENTATION_IMAGE
 from FoodCaloEstimate.estimator.services.food_dictionany_service import FoodDictionary
 from FoodCaloEstimate.estimator.services.image_service import ImageService
 from FoodCaloEstimate.queue_tasks import run_task_in_queue
@@ -31,7 +31,7 @@ class MyInputImageAdmin(ChartAdminModel):
 
     def render_image(self, obj, image_type):
         """Render image."""
-        url = obj.url.get(image_type, {}).get(LOCAL_IMAGE_URL, "")
+        url = obj.url.get(image_type, {}).get(DEFAULT_URL, "")
         return format_html(
             '<img src="{}" style="width:100%; height:auto; object-fit:contain;"/>',
             url

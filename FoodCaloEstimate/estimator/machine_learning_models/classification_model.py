@@ -41,7 +41,7 @@ class ClassificationModel:
             **data_config, is_training=False
         )
 
-    @torch.no_grad()
+    @torch.inference_mode()
     def predict(
         self,
         input_image: InMemoryUploadedFile,

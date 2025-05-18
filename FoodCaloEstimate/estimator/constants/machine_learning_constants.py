@@ -23,18 +23,20 @@ EfficientNetV2 = "EfficientNetV2"
 REFERENCE_POINT = "finger"
 REFERENCE_POINT_REAL_AREA = 1.4 * 1.8
 THRESHHOLD_PIXEL_REFERENCE_POINT_AREA = 10
-TEXT_PROMPT = ["food"]
-TEXT_PROMPT.append(REFERENCE_POINT)
-SEGMENTATION_COLORS = {
-    label: np.concatenate([np.random.random(3), [0.6]]) for label in TEXT_PROMPT
-}
+TEXT_PROMPT_LIST = ["food"]
+TEXT_PROMPT_LIST.append(REFERENCE_POINT)
+TEXT_PROMPT = ".".join(TEXT_PROMPT_LIST)
+
 SAM2_CHECKPOINT = rf"{settings.BASE_DIR}/FoodCaloEstimate/estimator/weights/sam2.1_hiera_large.pt"
 SAM2_CONFIG = "configs/sam2.1/sam2.1_hiera_l.yaml"
 GROUNDING_DINO_MODEL = "IDEA-Research/grounding-dino-tiny" # base, tiny
+DINOX_API_PATH = r"/v2/task/dinox/detection"
+DINOX_MODEL = "DINO-X-1.0"
 SegmentationModel_Key = "SegmentationModel"
 
-BOX_THRESHHOLD=0.4
-TEXT_THRESHHOLD=0.3
+BOX_THRESHOLD=0.4
+TEXT_THRESHOLD=0.3
+IOU_THRESHOLD = 0.8
 
 # Machine Learning Models
 MACHINE_LEARNING_MODELS = {
