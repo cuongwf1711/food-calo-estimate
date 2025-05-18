@@ -57,20 +57,23 @@ class ModelManager:
     @classmethod
     def release_models(cls):
         """Release all models."""
-        if cls._initialized:
-            cls._force_cleanup()
-            del cls._models
-            del cls._initialized
+        cls._force_cleanup()
+        del cls._models
+        del cls._initialized
 
     @classmethod
     def _force_cleanup(cls):
         """Force cleanup of all models."""
         for my_model in cls._models.values():
-            if hasattr(my_model, "model"):
-                del my_model.model
-            if hasattr(my_model, "sam2_predictor"):
-                my_model.sam2_predictor.reset_predictor()
-                del my_model.sam2_predictor
-            del my_model
+            # Reset predictors if any attribute provides reset_predictor
+            for attr_name in list(vars(my_model)):
+                attr = getattr(my_model, attr_name)
+                try:
+                    attr.reset_predictor()
+                except Exception:
+                    pass
+                # delete attribute
+                delattr(my_model, attr_name)
 
+        # Clear any other residual data
         clear_data()

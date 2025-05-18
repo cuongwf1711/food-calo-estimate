@@ -45,7 +45,6 @@ from FoodCaloEstimate.estimator.utils.custom_decorator import time_measure
 # from dds_cloudapi_sdk.tasks.v2_task import V2Task
 
 
-
 class SegmentationModel:
     """Segmentation Model."""
 
@@ -85,6 +84,7 @@ class SegmentationModel:
             target_sizes=[image.size[::-1]],
         )
         clear_data(inputs, outputs)
+        print(results)
         return results[0]["boxes"].cpu().numpy(), results[0]["text_labels"]
 
     @time_measure
@@ -125,10 +125,10 @@ class SegmentationModel:
                 mset_sum = mset.reshape(mset.shape[0], -1).sum(axis=1)
                 best_mask_idx = mset_sum.argmax()
                 mask = mset[best_mask_idx].astype(np.uint8)
-                category_areas[text_labels[idx]] += mset_sum.max()
+                category_areas[text_labels[idx]] += float(mset_sum.max())
             else:
                 mask = mset[0].astype(np.uint8)
-                category_areas[text_labels[idx]] += mask.sum()
+                category_areas[text_labels[idx]] += float(mask.sum())
 
             final_masks.append(mask)
 
@@ -163,6 +163,7 @@ class SegmentationModel:
         )
 
         self.client.run_task(task)
+        print(task.result["objects"])
         bboxes, labels = zip(
             *((obj["bbox"], obj["category"]) for obj in task.result["objects"])
         )

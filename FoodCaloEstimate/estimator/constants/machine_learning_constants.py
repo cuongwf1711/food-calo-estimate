@@ -39,9 +39,9 @@ DINOX_API_PATH = "/v2/task/dinox/detection"
 DINOX_MODEL = "DINO-X-1.0"
 SegmentationModel_Key = "SegmentationModel"
 
-BOX_THRESHOLD = 0.4
-TEXT_THRESHOLD = 0.3
-IOU_THRESHOLD = 0.8
+BOX_THRESHOLD = 0.4  # default both 0.25
+TEXT_THRESHOLD = 0.3  # default 0.25
+IOU_THRESHOLD = 0.8  # default 0.8
 
 # Machine Learning Models
 MACHINE_LEARNING_MODELS = {
