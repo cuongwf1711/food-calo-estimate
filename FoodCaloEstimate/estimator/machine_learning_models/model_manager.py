@@ -7,10 +7,10 @@
 
 from FoodCaloEstimate.estimator.constants.machine_learning_constants import (
     MACHINE_LEARNING_MODELS,
-    # ConvNextV2,
+    ConvNextV2,
     EfficientNetV2,
     SegmentationModel_Key,
-    # SwinTransformerV2,
+    SwinTransformerV2,
 )
 from FoodCaloEstimate.estimator.machine_learning_models.classification_model import (
     ClassificationModel,
@@ -33,7 +33,11 @@ class ModelManager:
         if not cls._initialized:
             cls._force_cleanup()
 
-            models = [EfficientNetV2]  # , ConvNextV2, SwinTransformerV2
+            models = [
+                EfficientNetV2,
+                ConvNextV2,
+                SwinTransformerV2,
+            ]  # , ConvNextV2, SwinTransformerV2
             for model in models:
                 cls._models[model] = ClassificationModel(
                     MACHINE_LEARNING_MODELS[model]["model_name"],
@@ -52,7 +56,7 @@ class ModelManager:
                 "Models have not been initialized. Call initialize_models() first."
             )
 
-        return cls._models.get(model_name, cls._models[EfficientNetV2])
+        return cls._models.get(model_name, cls._models[SwinTransformerV2])
 
     @classmethod
     def release_models(cls):
@@ -67,10 +71,9 @@ class ModelManager:
         for my_model in cls._models.values():
             # Reset predictors if any attribute provides reset_predictor
             for attr_name in list(vars(my_model)):
-                attr = getattr(my_model, attr_name)
                 try:
-                    attr.reset_predictor()
-                except Exception:
+                    getattr(my_model, attr_name).reset_predictor()
+                except BaseException:
                     pass
                 # delete attribute
                 delattr(my_model, attr_name)

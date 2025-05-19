@@ -18,7 +18,7 @@ def time_measure(func):
         start = time.time()
         result = func(*args, **kwargs)
         duration = time.time() - start
-        print(f"[TIMING] {func.__name__} took {duration:.4f}s")
+        print(f"[TIMING] {func.__qualname__} took {duration:.4f}s")
         return result
 
     return wrapper

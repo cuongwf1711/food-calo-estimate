@@ -9,9 +9,9 @@ from tempfile import NamedTemporaryFile
 
 import numpy as np
 import torch
-
-# from django.conf import settings
+from dds_cloudapi_sdk import Client, Config
 from dds_cloudapi_sdk.tasks.v2_task import V2Task
+from django.conf import settings
 from PIL import Image
 from sam2.build_sam import build_sam2
 from sam2.sam2_image_predictor import SAM2ImagePredictor
@@ -23,7 +23,8 @@ from transformers.models.auto.processing_auto import AutoProcessor
 
 from FoodCaloEstimate.estimator.constants.image_constants import FORMAT_IMAGE
 from FoodCaloEstimate.estimator.constants.machine_learning_constants import (
-    BOX_THRESHOLD,
+    BOX_THRESHOLD_DINOX,
+    BOX_THRESHOLD_GROUND_DINO,
     DEVICE,
     DINOX_API_PATH,
     DINOX_MODEL,
@@ -41,13 +42,13 @@ from FoodCaloEstimate.estimator.services.machine_leaning_service import (
 from FoodCaloEstimate.estimator.utils.clear_data import clear_data
 from FoodCaloEstimate.estimator.utils.custom_decorator import time_measure
 
-# from dds_cloudapi_sdk import Config, Client
-# from dds_cloudapi_sdk.tasks.v2_task import V2Task
+# from FoodCaloEstimate.estimator.utils.run_try__loop_funcs import run_try_loop_funcs
 
 
 class SegmentationModel:
     """Segmentation Model."""
 
+    @time_measure
     def __init__(self):
         """Init."""
         if torch.backends.cuda.is_built() and torch.cuda.is_available():
@@ -61,7 +62,7 @@ class SegmentationModel:
             .to(DEVICE)
         )
 
-        # self.client = Client(Config(settings.API_KEY_DINOX))
+        self.dds_client = Client(Config(settings.API_KEY_DINOX))
 
         self.SAM2_PREDICTOR = SAM2ImagePredictor(
             build_sam2(SAM2_CONFIG, SAM2_CHECKPOINT, device=DEVICE)
@@ -79,7 +80,7 @@ class SegmentationModel:
         results = self.processor.post_process_grounded_object_detection(
             outputs,
             inputs.input_ids,
-            box_threshold=BOX_THRESHOLD,
+            box_threshold=BOX_THRESHOLD_GROUND_DINO,
             text_threshold=TEXT_THRESHOLD,
             target_sizes=[image.size[::-1]],
         )
@@ -113,9 +114,15 @@ class SegmentationModel:
     @torch.inference_mode()
     def get_area_food_from_text_prompt(self, input_image):
         """Get area food from text prompt."""
+        # FIXME; Adjust to fit the production in the future
+
         multimask_output = True
         with Image.open(input_image) as image:
             input_boxes, text_labels = self._get_boxes_groundino(image)
+
+            # input_boxes, text_labels = run_try_loop_funcs(
+            #     [self._get_boxes_dinox, self._get_boxes_groundino], image
+            # )
             all_masks = self._get_masks(image, input_boxes, multimask_output)
 
         final_masks = []
@@ -145,7 +152,7 @@ class SegmentationModel:
         with NamedTemporaryFile(suffix=f".{FORMAT_IMAGE}") as temp_file:
             temp_filename = temp_file.name
             image.save(temp_filename, format=FORMAT_IMAGE, quality=100, optimize=True)
-            infer_image_url = self.client.upload_file(temp_filename)
+            infer_image_url = self.dds_client.upload_file(temp_filename)
 
         task = V2Task(
             api_path=DINOX_API_PATH,
@@ -156,13 +163,13 @@ class SegmentationModel:
                     "type": "text",
                     "text": TEXT_PROMPT,
                 },
-                "targets": ["bbox", "mask"],
-                "bbox_threshold": BOX_THRESHOLD,
+                "targets": ["bbox"],
+                "bbox_threshold": BOX_THRESHOLD_DINOX,
                 "iou_threshold": IOU_THRESHOLD,
             },
         )
 
-        self.client.run_task(task)
+        self.dds_client.run_task(task)
         print(task.result["objects"])
         bboxes, labels = zip(
             *((obj["bbox"], obj["category"]) for obj in task.result["objects"])

@@ -59,14 +59,19 @@ class InputImageSerializer(serializers.ModelSerializer):
             "predict",
             "confidence_percentage",
             "created_at",
-
             "public_url",
             "predict_name",
-
             "comment",
             "image_file",
+            "calo",
         ]
-        read_only_fields = ["id", "predict", "confidence_percentage", "created_at"]
+        read_only_fields = [
+            "id",
+            "predict",
+            "confidence_percentage",
+            "created_at",
+            "calo",
+        ]
 
     def validate_comment(self, value):
         """Validate comment field."""

@@ -10,6 +10,8 @@ import os
 import torch
 from django.conf import settings
 
+# FIXME; Adjust to fit the production in the future
+
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(f"Using device: {DEVICE}")
 DEFAULT_CONFIDENCE_THRESHOLD = 0.7
@@ -35,13 +37,15 @@ SAM2_VERSION = "sam2.1_hiera_t"
 SAM2_CHECKPOINT = os.path.join(FOLDER_WEIGHT, f"{SAM2_VERSION}.pt")
 SAM2_CONFIG = f"configs/sam2.1/{SAM2_VERSION}.yaml"
 GROUNDING_DINO_MODEL = "IDEA-Research/grounding-dino-tiny"  # base, tiny
-DINOX_API_PATH = "/v2/task/dinox/detection"
-DINOX_MODEL = "DINO-X-1.0"
+DINOX_API_PATH = "/v2/task/grounding_dino/detection"  # /v2/task/grounding_dino/detection, /v2/task/dinox/detection
+DINOX_MODEL = "GroundingDino-1.6-Pro"  # GroundingDino-1.6-Pro, DINO-X-1.0
 SegmentationModel_Key = "SegmentationModel"
 
-BOX_THRESHOLD = 0.4  # default both 0.25
+BOX_THRESHOLD_GROUND_DINO = 0.4  # default 0.25
 TEXT_THRESHOLD = 0.3  # default 0.25
-IOU_THRESHOLD = 0.8  # default 0.8
+
+BOX_THRESHOLD_DINOX = 0.3  # default 0.25
+IOU_THRESHOLD = 0.7  # default 0.8
 
 # Machine Learning Models
 MACHINE_LEARNING_MODELS = {

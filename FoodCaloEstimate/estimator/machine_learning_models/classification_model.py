@@ -24,6 +24,7 @@ from FoodCaloEstimate.estimator.utils.custom_decorator import time_measure
 class ClassificationModel:
     """Classification Model."""
 
+    @time_measure
     def __init__(self, model_name: str, checkpoint_path: str) -> None:
         """Init."""
         self.model = timm.create_model(
