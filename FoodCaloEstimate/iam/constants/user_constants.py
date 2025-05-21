@@ -1,0 +1,12 @@
+# Copyright (C)
+# date: 21-05-2025
+# author: cuongwf1711
+# email: ruivalien@gmail.com
+
+"""User Constants."""
+
+DEFAULT_LENGTH_REFERENCE_POINT = 1.8
+DEFAULT_WIDTH_REFERENCE_POINT = 1.4
+
+MAX_LENGTH_REFERENCE_POINT = 20
+MAX_WIDTH_REFERENCE_POINT = 10

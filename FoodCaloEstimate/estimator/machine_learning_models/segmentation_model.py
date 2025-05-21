@@ -22,16 +22,18 @@ from transformers.models.auto.modeling_auto import AutoModelForZeroShotObjectDet
 from transformers.models.auto.processing_auto import AutoProcessor
 
 from FoodCaloEstimate.estimator.constants.image_constants import FORMAT_IMAGE
-from FoodCaloEstimate.estimator.constants.machine_learning_constants import (
-    BOX_THRESHOLD_DINOX,
-    BOX_THRESHOLD_GROUND_DINO,
-    DEVICE,
+from FoodCaloEstimate.estimator.constants.model_checkpoint_constants import (
     DINOX_API_PATH,
     DINOX_MODEL,
     GROUNDING_DINO_MODEL,
-    IOU_THRESHOLD,
     SAM2_CHECKPOINT,
     SAM2_CONFIG,
+)
+from FoodCaloEstimate.estimator.constants.parameter_constants import (
+    BOX_THRESHOLD_DINOX,
+    BOX_THRESHOLD_GROUND_DINO,
+    DEVICE,
+    IOU_THRESHOLD,
     TEXT_PROMPT,
     TEXT_PROMPT_LIST,
     TEXT_THRESHOLD,

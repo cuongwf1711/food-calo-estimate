@@ -11,8 +11,7 @@ import numpy as np
 from PIL import Image
 
 from FoodCaloEstimate.estimator.constants.image_constants import FORMAT_IMAGE
-from FoodCaloEstimate.estimator.constants.machine_learning_constants import (
-    REFERENCE_POINT_REAL_AREA,
+from FoodCaloEstimate.estimator.constants.parameter_constants import (
     TEXT_PROMPT_LIST,
     THRESHHOLD_PIXEL_REFERENCE_POINT_AREA,
 )
@@ -24,7 +23,10 @@ class MachineLearningService:
 
     @staticmethod
     def calculate_calories(
-        label: int, food_pixel_area: float, reference_point_pixel_area: float
+        label: int,
+        food_pixel_area: float,
+        reference_point_pixel_area: float,
+        REFERENCE_POINT_REAL_AREA: float,
     ) -> float:
         """Calculate calories."""
         if reference_point_pixel_area < THRESHHOLD_PIXEL_REFERENCE_POINT_AREA:

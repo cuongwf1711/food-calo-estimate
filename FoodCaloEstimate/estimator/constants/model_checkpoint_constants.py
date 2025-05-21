@@ -7,27 +7,12 @@
 
 import os
 
-import torch
 from django.conf import settings
-
-# FIXME; Adjust to fit the production in the future
-
-DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-print(f"Using device: {DEVICE}")
-DEFAULT_CONFIDENCE_THRESHOLD = 0.7
 
 # Classification Model
 ConvNextV2 = "ConvNextV2"
 SwinTransformerV2 = "SwinTransformerV2"
 EfficientNetV2 = "EfficientNetV2"
-
-# Segmentation Model
-REFERENCE_POINT = "finger"
-REFERENCE_POINT_REAL_AREA = 1.4 * 1.8
-THRESHHOLD_PIXEL_REFERENCE_POINT_AREA = 10
-TEXT_PROMPT_LIST = ["food"]
-TEXT_PROMPT_LIST.append(REFERENCE_POINT)
-TEXT_PROMPT = ".".join(TEXT_PROMPT_LIST)
 
 FOLDER_WEIGHT = os.path.join(
     settings.BASE_DIR, "FoodCaloEstimate", "estimator", "weights"
@@ -40,12 +25,6 @@ GROUNDING_DINO_MODEL = "IDEA-Research/grounding-dino-tiny"  # base, tiny
 DINOX_API_PATH = "/v2/task/grounding_dino/detection"  # /v2/task/grounding_dino/detection, /v2/task/dinox/detection
 DINOX_MODEL = "GroundingDino-1.6-Pro"  # GroundingDino-1.6-Pro, DINO-X-1.0
 SegmentationModel_Key = "SegmentationModel"
-
-BOX_THRESHOLD_GROUND_DINO = 0.4  # default 0.25
-TEXT_THRESHOLD = 0.3  # default 0.25
-
-BOX_THRESHOLD_DINOX = 0.3  # default 0.25
-IOU_THRESHOLD = 0.7  # default 0.8
 
 # Machine Learning Models
 MACHINE_LEARNING_MODELS = {

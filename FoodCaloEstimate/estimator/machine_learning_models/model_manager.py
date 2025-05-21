@@ -5,7 +5,7 @@
 
 """Model Manager."""
 
-from FoodCaloEstimate.estimator.constants.machine_learning_constants import (
+from FoodCaloEstimate.estimator.constants.model_checkpoint_constants import (
     MACHINE_LEARNING_MODELS,
     ConvNextV2,
     EfficientNetV2,

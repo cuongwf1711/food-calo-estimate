@@ -6,5 +6,6 @@
 """Init."""
 
 from FoodCaloEstimate.iam.models.user import User
+from FoodCaloEstimate.iam.models.user_profile import UserProfile
 
-__all__ = ["User"]
+__all__ = ["User", "UserProfile"]

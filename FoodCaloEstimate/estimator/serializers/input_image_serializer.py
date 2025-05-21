@@ -16,7 +16,7 @@ from FoodCaloEstimate.estimator.constants.image_constants import (
     SEGMENTATION_IMAGE,
     UNKNOWN,
 )
-from FoodCaloEstimate.estimator.constants.machine_learning_constants import (
+from FoodCaloEstimate.estimator.constants.model_checkpoint_constants import (
     SegmentationModel_Key,
 )
 from FoodCaloEstimate.estimator.machine_learning_models.model_manager import (
@@ -91,19 +91,19 @@ class InputImageSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         """Create."""
 
-        validated_data.clear()
-        validated_data["user"] = self.context["request"].user
-        validated_data["confidence"], validated_data["predict"] = 1, 1
-        validated_data["calo"] = 100
-        validated_data["url"] = {
-            ORIGIN_IMAGE: {
-                DEFAULT_URL: "123",
-            },
-            SEGMENTATION_IMAGE: {
-                DEFAULT_URL: "456",
-            },
-        }
-        return super().create(validated_data)
+        # validated_data.clear()
+        # validated_data["user"] = self.context["request"].user
+        # validated_data["confidence"], validated_data["predict"] = 1, 1
+        # validated_data["calo"] = 100
+        # validated_data["url"] = {
+        #     ORIGIN_IMAGE: {
+        #         DEFAULT_URL: "123",
+        #     },
+        #     SEGMENTATION_IMAGE: {
+        #         DEFAULT_URL: "456",
+        #     },
+        # }
+        # return super().create(validated_data)
 
         image_file = validated_data["image_file"]
         validated_data.clear()
@@ -124,6 +124,7 @@ class InputImageSerializer(serializers.ModelSerializer):
 
         image_file.seek(0)
         image_byteio = io.BytesIO(image_file.read())
+        user = self.context["request"].user
 
         (
             origin_image_cloudinary,
@@ -142,11 +143,13 @@ class InputImageSerializer(serializers.ModelSerializer):
                     validated_data["predict"],
                     food_pixel_area,
                     reference_point_pixel_area,
+                    user.userprofile.area_reference_point,
                 ),
                 {},
             ),
         )
 
+        # upload image to local
         # (
         #     (origin_image_cloudinary, origin_image_local),
         #     (segmentation_image_cloudinary, segmentation_image_local),
@@ -181,7 +184,7 @@ class InputImageSerializer(serializers.ModelSerializer):
                 # **segmentation_image_local,
             },
         }
-        validated_data["user"] = self.context["request"].user
+        validated_data["user"] = user
         clear_data()
         return super().create(validated_data)
 

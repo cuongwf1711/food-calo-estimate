@@ -10,11 +10,9 @@ import torch
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from PIL import Image
 
-from FoodCaloEstimate.estimator.constants.machine_learning_constants import (
+from FoodCaloEstimate.estimator.constants.parameter_constants import (
     DEFAULT_CONFIDENCE_THRESHOLD,
     DEVICE,
-)
-from FoodCaloEstimate.estimator.constants.my_food_calo_estimate_constants import (
     NUM_CLASSES,
 )
 from FoodCaloEstimate.estimator.utils.clear_data import clear_data
