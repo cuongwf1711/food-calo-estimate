@@ -22,6 +22,7 @@ class ChartAdminModel(ModelAdmin):
         id: name["name_accent"] for id, name in FoodDictionary.id_to_food.items()
     }
     model = MyInputImage
+    MAX_X = 30
 
     def get_urls(self):
         extra_urls = [
@@ -46,7 +47,7 @@ class ChartAdminModel(ModelAdmin):
             self.model.objects.annotate(date=TruncDay("created_at"))
             .values("date")
             .annotate(y=annotate_y)
-            .order_by("-date")
+            .order_by("-date")[: self.MAX_X]
         )
         return JsonResponse(list(data), safe=False)
 
@@ -78,7 +79,11 @@ class ChartAdminModel(ModelAdmin):
 
     def get_data_from_user(self, field):
         """Get data for all labels."""
-        data = self.model.objects.values(field).annotate(y=Count("id"))
+        data = (
+            self.model.objects.values(field)
+            .annotate(y=Count("id"))
+            .order_by("-y")[: self.MAX_X]
+        )
         return JsonResponse(
             [{"x": item[field], "y": item["y"]} for item in data],
             safe=False,
