@@ -11,6 +11,7 @@ from FoodCaloEstimate.estimator.models.my_input_image import MyInputImage
 from FoodCaloEstimate.estimator.serializers.input_image_serializer import (
     InputImageSerializer,
 )
+from FoodCaloEstimate.estimator.view_filters.input_image_filter import InputImageFilter
 
 
 class InputImageViewSet(viewsets.ModelViewSet):
@@ -20,3 +21,5 @@ class InputImageViewSet(viewsets.ModelViewSet):
     serializer_class = InputImageSerializer
     permission_classes = [permissions.IsAuthenticated]
     http_method_names = ["get", "post", "patch"]
+
+    filterset_class = InputImageFilter
