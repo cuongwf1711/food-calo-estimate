@@ -5,7 +5,9 @@
 
 """Input Image View Set."""
 
-from rest_framework import permissions, viewsets
+from django.utils import timezone
+from rest_framework import permissions, status, viewsets
+from rest_framework.response import Response
 
 from FoodCaloEstimate.estimator.models.my_input_image import MyInputImage
 from FoodCaloEstimate.estimator.serializers.input_image_serializer import (
@@ -22,10 +24,17 @@ from FoodCaloEstimate.estimator.view_filters.input_image_filter import (
 class InputImageViewSet(viewsets.ModelViewSet):
     """Input Image View Set."""
 
-    queryset = MyInputImage.objects.all()
+    queryset = MyInputImage.objects.filter(is_deleted=False)
     serializer_class = InputImageSerializer
     permission_classes = [permissions.IsAuthenticated]
-    http_method_names = ["get", "post", "patch"]
+    http_method_names = ["get", "post", "patch", "delete"]
     pagination_class = MyInputImagePagination
-
     filterset_class = InputImageFilter
+
+    def destroy(self, request, *args, **kwargs):
+        """Soft delete the input image."""
+        instance = self.get_object()
+        instance.is_deleted = True
+        instance.deleted_at = timezone.now()
+        instance.save()
+        return Response(status=status.HTTP_204_NO_CONTENT)

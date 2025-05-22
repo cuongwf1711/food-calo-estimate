@@ -11,6 +11,7 @@ import django_filters
 from django.utils import timezone
 
 from FoodCaloEstimate.estimator.models.my_input_image import MyInputImage
+from FoodCaloEstimate.iam.constants.period_choices import TimePeriod
 
 
 class InputImageFilter(django_filters.FilterSet):
@@ -27,22 +28,29 @@ class InputImageFilter(django_filters.FilterSet):
     def filter_month(self, qs, name, value):
         try:
             d = datetime.strptime(value, "%Y-%m")
-        except ValueError:
+        except:
             return qs.none()
         return qs.filter(created_at__year=d.year, created_at__month=d.month)
 
     def filter_week(self, queryset, name, idx):
         try:
             idx = int(idx)
-        except (TypeError, ValueError):
+        except:
             return queryset.none()
         if idx < 0:
             return queryset.none()
 
         today = timezone.now().date()
         start = today - timedelta(days=today.weekday()) - timedelta(weeks=idx)
-        end = start + timedelta(days=6)
+        end = start + timedelta(days=TimePeriod.WEEK - 1)
         return queryset.filter(
             created_at__date__gte=start,
             created_at__date__lte=end,
         )
+
+    def filter_queryset(self, queryset):
+        """Filter queryset."""
+        params = [self.data.get("day"), self.data.get("month"), self.data.get("week")]
+        if sum(1 for p in params if p is not None) > 1:
+            return queryset.none()
+        return super().filter_queryset(queryset)

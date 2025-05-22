@@ -36,7 +36,7 @@ class SetPasswordSerializer(serializers.Serializer):
         try:
             if User.objects.get(username=email):
                 raise serializers.ValidationError(EXISTED_ACOUNT)
-        except User.DoesNotExist:
+        except:
             check_valid_client_otp_or_raise_exception(email, attrs["otp"])
         return attrs
 

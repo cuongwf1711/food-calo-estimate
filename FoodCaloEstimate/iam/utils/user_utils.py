@@ -17,7 +17,7 @@ def get_valid_user_or_raise_exeption(email):
     """Get valid user."""
     try:
         user = User.objects.get(username=email)
-    except User.DoesNotExist:
+    except:
         raise ValidationError(ACCOUNT_NOT_EXIST)
 
     if not user.is_active:

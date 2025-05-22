@@ -67,6 +67,7 @@ class MyInputImageAdmin(ChartAdminModel):
         "staff",
         "comment",
         "calo",
+        "is_deleted",
     )
     search_fields = ("user__username", "staff__username")
     readonly_fields = [
@@ -79,6 +80,7 @@ class MyInputImageAdmin(ChartAdminModel):
         "calo",
         "predict_name",
         "origin_and_segmentation_images",
+        "is_deleted",
     ]
     list_filter = (
         make_int_choice_filter("label", "Label"),
@@ -86,11 +88,13 @@ class MyInputImageAdmin(ChartAdminModel):
         ConfidenceRangeFilter,
         "created_at",
         "updated_at",
+        "is_deleted",
     )
     exclude = (
         "url",
         "confidence",
         "predict",
+        "deleted_at",
     )
 
     def save_model(self, request, obj, form, change):
@@ -107,3 +111,9 @@ class MyInputImageAdmin(ChartAdminModel):
     def has_add_permission(self, request):
         """Check if user has permission to add."""
         return False
+
+    def has_delete_permission(self, request, obj=None):
+        """Check if user has permission to delete."""
+        if obj and not obj.is_deleted:
+            return False
+        return super().has_delete_permission(request, obj)

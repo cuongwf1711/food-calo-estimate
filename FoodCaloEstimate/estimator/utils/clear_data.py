@@ -15,7 +15,7 @@ def clear_data(*variables):
     for t in variables:
         try:
             del t
-        except NameError:
+        except:
             pass
 
     gc.collect()

@@ -73,7 +73,7 @@ class ModelManager:
             for attr_name in list(vars(my_model)):
                 try:
                     getattr(my_model, attr_name).reset_predictor()
-                except BaseException:
+                except:
                     pass
                 # delete attribute
                 delattr(my_model, attr_name)

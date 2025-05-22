@@ -16,7 +16,7 @@ from django.dispatch import receiver
 from FoodCaloEstimate.iam.constants.period_choices import (
     MAX_LENGTH_PERIOD,
     PERIOD_CHOICES,
-    PERIOD_DAY,
+    TimePeriod,
 )
 from FoodCaloEstimate.iam.constants.user_constants import (
     DEFAULT_LENGTH_REFERENCE_POINT,
@@ -57,7 +57,9 @@ class UserProfile(UUIDModel, AutoTimeStampedModel):
     weight = models.PositiveSmallIntegerField(null=True)
     calorie_limit = models.FloatField(null=True)
     calorie_limit_period = models.CharField(
-        max_length=MAX_LENGTH_PERIOD, choices=PERIOD_CHOICES, default=PERIOD_DAY
+        max_length=MAX_LENGTH_PERIOD,
+        choices=PERIOD_CHOICES,
+        default=TimePeriod.DAY.label,
     )
 
     @property
@@ -98,7 +100,11 @@ class UserProfile(UUIDModel, AutoTimeStampedModel):
         gender_specific_adjustment = 5 if self.gender else -161
 
         # Add the gender adjustment to the base BMR
-        total_calculated_bmr = base_bmr_calculation + gender_specific_adjustment
+        total_calculated_bmr_per_day = base_bmr_calculation + gender_specific_adjustment
+
+        total_calculated_bmr = total_calculated_bmr_per_day * TimePeriod.from_label(
+            self.calorie_limit_period
+        )
 
         # Round the final BMR to two decimal places for accuracy
         final_bmr_value = round(total_calculated_bmr, 2)

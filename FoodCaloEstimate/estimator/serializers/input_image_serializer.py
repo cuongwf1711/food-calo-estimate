@@ -70,15 +70,19 @@ class InputImageSerializer(serializers.ModelSerializer):
             "predict",
             "confidence_percentage",
             "created_at",
-            "calo",
         ]
+        extra_kwargs = {
+            "calo": {
+                "required": False,
+            }
+        }
 
-    def validate_comment(self, value):
-        """Validate comment field."""
-        already_comment = self.instance and self.instance.comment
-        if already_comment:
-            raise serializers.ValidationError("Comment is not allowed.")
-        return value
+    # def validate_comment(self, value):
+    #     """Validate comment field."""
+    #     already_comment = self.instance and self.instance.comment
+    #     if already_comment:
+    #         raise serializers.ValidationError("Comment is not allowed.")
+    #     return value
 
     def validate_image_file(self, image):
         """Validate method."""
@@ -191,10 +195,15 @@ class InputImageSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         """Update."""
         comment = validated_data.get("comment")
-        validated_data.clear()
-        if comment:
-            validated_data["comment"] = comment
-        return super().update(instance, validated_data)
+        calo = validated_data.get("calo")
+        if comment or calo:
+            validated_data.clear()
+            if comment:
+                validated_data["comment"] = comment
+            if calo:
+                validated_data["calo"] = calo
+            return super().update(instance, validated_data)
+        return instance
 
 
 def test1(a, b, c):

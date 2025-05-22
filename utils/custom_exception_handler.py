@@ -21,10 +21,16 @@ def custom_exception_handler(exc, context):
         data = {"success": False, "errors": exc.detail}
         return Response(data, status=exc.status_code)
 
+    if isinstance(exc, Http404):
+        exc = exceptions.NotFound(*(exc.args))
+        return Response(
+            get_message_response(success=False, message=exc.detail),
+            status=404,
+        )
+
     if isinstance(
         exc,
         (
-            Http404,
             exceptions.Throttled,
             exceptions.NotAuthenticated,
             exceptions.AuthenticationFailed,

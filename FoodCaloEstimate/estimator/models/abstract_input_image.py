@@ -11,12 +11,16 @@ from django.db import models
 
 from FoodCaloEstimate.estimator.constants.image_constants import UNKNOWN_INDEX
 from FoodCaloEstimate.iam.constants.django_model_constant import MAX_LENGTH_CHAR_FIELD
-from FoodCaloEstimate.iam.models.base_model import AutoTimeStampedModel, UUIDModel
+from FoodCaloEstimate.iam.models.base_model import (
+    AutoTimeStampedModel,
+    SoftDeleteModel,
+    UUIDModel,
+)
 
 User = get_user_model()
 
 
-class AbstractInputImage(AutoTimeStampedModel, UUIDModel):
+class AbstractInputImage(AutoTimeStampedModel, UUIDModel, SoftDeleteModel):
     """Abstract Input Image."""
 
     url = models.JSONField()
