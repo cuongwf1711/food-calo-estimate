@@ -23,6 +23,10 @@ class TimePeriod(models.IntegerChoices):
         raise ValueError(f"Invalid period label: {label}")
 
 
+DAY_FORMAT = "%Y-%m-%d"
+MONTH_FORMAT = "%Y-%m"
+
+
 PERIOD_CHOICES = tuple((item.label, item.label) for item in TimePeriod)
 
 

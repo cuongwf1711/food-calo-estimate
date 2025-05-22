@@ -11,7 +11,11 @@ from rest_framework import serializers
 
 from FoodCaloEstimate.estimator.models.my_input_image import MyInputImage
 from FoodCaloEstimate.estimator.view_filters.input_image_filter import InputImageFilter
-from FoodCaloEstimate.iam.constants.period_choices import TimePeriod
+from FoodCaloEstimate.iam.constants.period_choices import (
+    DAY_FORMAT,
+    MONTH_FORMAT,
+    TimePeriod,
+)
 from FoodCaloEstimate.iam.models.user_profile import UserProfile
 
 
@@ -29,11 +33,11 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
         params = dict()
         if period in TimePeriod.DAY.label:
-            params["day"] = now.strftime("%Y-%m-%d")
+            params["day"] = now.strftime(DAY_FORMAT)
         elif period == TimePeriod.WEEK.label:
             params["week"] = 0
         elif period == TimePeriod.MONTH.label:
-            params["month"] = now.strftime("%Y-%m")
+            params["month"] = now.strftime(MONTH_FORMAT)
         else:
             return 0.0
 
