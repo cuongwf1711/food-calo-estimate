@@ -15,6 +15,7 @@ from FoodCaloEstimate.estimator.models.my_input_image import MyInputImage
 from FoodCaloEstimate.estimator.services.food_dictionany_service import FoodDictionary
 
 
+# use: add method, add method to extra_urls, change file change_list.html
 class ChartAdminModel(ModelAdmin):
     """Chart Admin Model."""
 
@@ -34,8 +35,7 @@ class ChartAdminModel(ModelAdmin):
                 "user": self.chart_data_user_endpoint,
                 "staff": self.chart_data_staff_endpoint,
                 "calories": self.chart_data_calories_endpoint,
-                "processed": self.chart_data_processed_endpoint,
-                "accuracy": self.chart_data_accuracy_endpoint,
+                "percentage": self.chart_data_percentage_endpoint,
             }.items()
         ]
         return extra_urls + super().get_urls()
@@ -97,40 +97,41 @@ class ChartAdminModel(ModelAdmin):
         """Chart data grouped by staff."""
         return self.get_data_from_user("staff__username")
 
-    def chart_data_processed_endpoint(self, request):
-        """Chart data processed by staff."""
-        counts = self.model.objects.aggregate(
-            unprocessed=Count("id", filter=Q(staff__isnull=True)),
-            processed=Count("id", filter=Q(staff__isnull=False)),
-        )
-        data = [
-            {"x": "unprocessed", "y": counts["unprocessed"]},
-            {"x": "processed", "y": counts["processed"]},
-        ]
-        return JsonResponse(data, safe=False)
-
-    def chart_data_accuracy_endpoint(self, request):
-        """Chart data accuracy."""
+    def chart_data_percentage_endpoint(self, request):
+        """Chart data percentage."""
         stats = self.model.objects.aggregate(
             unprocessed_count=Count("id", filter=Q(staff__isnull=True)),
             processed_count=Count("id", filter=Q(staff__isnull=False)),
             correct_predictions=Count(
                 "id", filter=Q(staff__isnull=False) & Q(label=F("predict"))
             ),
+            deleted_count=Count("id", filter=Q(is_deleted=True)),
+            not_deleted_count=Count("id", filter=Q(is_deleted=False)),
         )
 
         unprocessed = stats["unprocessed_count"] or 0
         processed = stats["processed_count"] or 0
         correct = stats["correct_predictions"] or 0
+        deleted = stats["deleted_count"] or 0
+        not_deleted = stats["not_deleted_count"] or 0
 
         accuracy_percentage = (correct / processed * 100) if processed else 0.0
         processed_ratio_pct = (processed / unprocessed * 100) if unprocessed else 0.0
+        deleted_percentage = (
+            (deleted / (deleted + not_deleted) * 100)
+            if (deleted + not_deleted)
+            else 0.0
+        )
+        not_deleted_percentage = (
+            (not_deleted / (deleted + not_deleted) * 100)
+            if (deleted + not_deleted)
+            else 0.0
+        )
 
         response_data = [
-            {"x": "Accuracy (%)", "y": float(f"{accuracy_percentage:.2f}")},
-            {
-                "x": "Processed/Unprocessed (%)",
-                "y": float(f"{processed_ratio_pct:.2f}"),
-            },
+            {"x": "Accuracy", "y": float(f"{accuracy_percentage:.2f}")},
+            {"x": "Processed/Unprocessed", "y": float(f"{processed_ratio_pct:.2f}")},
+            {"x": "Deleted", "y": float(f"{deleted_percentage:.2f}")},
+            {"x": "Not Deleted", "y": float(f"{not_deleted_percentage:.2f}")},
         ]
         return JsonResponse(response_data, safe=False)

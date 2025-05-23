@@ -6,7 +6,9 @@
 """Input Image View Set."""
 
 from django.utils import timezone
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import permissions, status, viewsets
+from rest_framework.filters import OrderingFilter
 from rest_framework.response import Response
 
 from FoodCaloEstimate.estimator.models.my_input_image import MyInputImage
@@ -29,7 +31,9 @@ class InputImageViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     http_method_names = ["get", "post", "patch", "delete"]
     pagination_class = MyInputImagePagination
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
     filterset_class = InputImageFilter
+    ordering_fields = ["calo", "created_at"]
 
     def destroy(self, request, *args, **kwargs):
         """Soft delete the input image."""

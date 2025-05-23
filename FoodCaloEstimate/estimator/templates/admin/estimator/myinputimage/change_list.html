@@ -10,37 +10,37 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.min.js"></script>
 
 <style>
-.my-chart-container canvas {
-    width: 100% !important;
-    height: 80vh !important;
-}
-.my-button-group {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 1rem;
-    margin-bottom: 10px;
-}
+    .my-chart-container canvas {
+        width: 100% !important;
+        height: 80vh !important;
+    }
 
-.my-button-group button {
-    flex: 1 1 auto;
-    padding: .5em 1em;
-    border: 1px solid #ccc;
-    background: #f5f5f5;
-    cursor: pointer;
-    transition: background .2s;
-}
+    .my-button-group {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin-bottom: 10px;
+    }
 
-.my-button-group button:hover {
-    background: #e1e1e1;
-}
+    .my-button-group button {
+        flex: 1 1 auto;
+        padding: .5em 1em;
+        border: 1px solid #ccc;
+        background: #f5f5f5;
+        cursor: pointer;
+        transition: background .2s;
+    }
 
-.my-button-group button.active {
-    background: #28a745;
-    color: #fff;
-    border-color: #248a3a;
-}
+    .my-button-group button:hover {
+        background: #e1e1e1;
+    }
 
+    .my-button-group button.active {
+        background: #28a745;
+        color: #fff;
+        border-color: #248a3a;
+    }
 </style>
 
 <script>
@@ -100,30 +100,13 @@
         });
 
         const buttons = [
-            {id: 'date', url: `${BASE}/chart_data_date`, xType: 'time'},
+            { id: 'date', url: `${BASE}/chart_data_date`, xType: 'time' },
             { id: 'label_type', url: `${BASE}/chart_data_label_type`, xType: 'category' },
             { id: 'predict_type', url: `${BASE}/chart_data_predict_type`, xType: 'category' },
             { id: 'user', url: `${BASE}/chart_data_user`, xType: 'category' },
             { id: 'staff', url: `${BASE}/chart_data_staff`, xType: 'category' },
-
-            {
-                id: 'calories',
-                url: `${BASE}/chart_data_calories`,
-                xType: 'time',
-                label: 'calories'
-            },
-
-            {
-                id: 'dataProcessed',
-                url: `${BASE}/chart_data_processed`,
-                xType: 'category',
-            },
-
-            {
-                id: 'accuracy',
-                url: `${BASE}/chart_data_accuracy`,
-                xType: 'category',
-            },
+            { id: 'calories', url: `${BASE}/chart_data_calories`, xType: 'time', label: 'calories' },
+            { id: 'percentage', url: `${BASE}/chart_data_percentage`, xType: 'category', label: '%', yConfig: { min: 0, max: 100 } },
         ];
 
         const updateChart = async (config) => {
@@ -141,7 +124,8 @@
                 if (xType === 'time') chart.options.scales.xAxes[0].time = timeConfig;
                 if (xType === 'category') chart.options.scales.xAxes[0].labels = json.map(d => d.x);
 
-                chart.options.scales.yAxes[0].ticks = { ...globalyAxesConfig, ...yConfig };
+                const ticksConfig = { ...globalyAxesConfig, ...(yConfig || {}) };
+                chart.options.scales.yAxes[0].ticks = ticksConfig;
                 chart.data.datasets[0].label = label;
 
                 chart.update();
@@ -152,13 +136,10 @@
 
         const btns = document.querySelectorAll('.my-button-group button');
         if (btns.length) btns[0].classList.add('active');
-        btns.forEach(btn =>
-            btn.addEventListener('click', () => {
-                btns.forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-            })
-        );
-
+        btns.forEach(btn => btn.addEventListener('click', () => {
+            btns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        }));
 
         buttons.forEach(button => {
             document.getElementById(button.id).addEventListener('click', () => updateChart(button));
@@ -180,8 +161,7 @@
         <button id="user">User</button>
         <button id="staff">Staff</button>
         <button id="calories">Calories</button>
-        <button id="dataProcessed">Data Processed</button>
-        <button id="accuracy">Accuracy</button>
+        <button id="percentage">Percentage</button>
     </div>
 </div>
 <h1>

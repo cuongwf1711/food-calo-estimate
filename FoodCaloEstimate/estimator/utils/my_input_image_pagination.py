@@ -13,6 +13,9 @@ from rest_framework.response import Response
 class MyInputImagePagination(PageNumberPagination):
     """My Input Image Pagination."""
 
+    # page_size_query_param = "page_size"
+    # max_page_size = 1000
+
     def paginate_queryset(self, queryset, request, view=None):
         """Paginate the queryset."""
         self.queryset = queryset

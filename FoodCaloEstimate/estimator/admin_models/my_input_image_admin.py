@@ -5,6 +5,7 @@
 
 """My Input Image Admin."""
 
+from django.contrib.admin import EmptyFieldListFilter
 from django.utils.html import format_html
 
 from FoodCaloEstimate.estimator.admin_models.chart_admin_model import ChartAdminModel
@@ -86,6 +87,7 @@ class MyInputImageAdmin(ChartAdminModel):
         make_int_choice_filter("label", "Label"),
         make_int_choice_filter("predict", "Prediction"),
         ConfidenceRangeFilter,
+        ("staff", EmptyFieldListFilter),
         "created_at",
         "updated_at",
         "is_deleted",
