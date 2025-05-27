@@ -81,36 +81,6 @@ class UserProfile(UUIDModel, AutoTimeStampedModel):
         """Area reference point."""
         return self.length_reference_point * self.width_reference_point
 
-    def calculate_auto_calorie_limit(self):
-        """Calculate calorie limit based on user profile."""
-        if (
-            self.gender is None
-            or self.age is None
-            or self.height is None
-            or self.weight is None
-        ):
-            return self.calorie_limit
-
-        # Calculate the base BMR using weight, height, and age
-        # This part is common for both genders
-        base_bmr_calculation = 10 * self.weight + 6.25 * self.height - 5 * self.age
-
-        # Determine the gender-specific adjustment value
-        # Add 5 for males, subtract 161 for females
-        gender_specific_adjustment = 5 if self.gender else -161
-
-        # Add the gender adjustment to the base BMR
-        total_calculated_bmr_per_day = base_bmr_calculation + gender_specific_adjustment
-
-        total_calculated_bmr = total_calculated_bmr_per_day * TimePeriod.from_label(
-            self.calorie_limit_period
-        )
-
-        # Round the final BMR to two decimal places for accuracy
-        final_bmr_value = round(total_calculated_bmr, 2)
-
-        return final_bmr_value
-
 
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):

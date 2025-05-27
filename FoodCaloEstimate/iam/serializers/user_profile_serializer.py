@@ -17,6 +17,7 @@ from FoodCaloEstimate.iam.constants.period_choices import (
     TimePeriod,
 )
 from FoodCaloEstimate.iam.models.user_profile import UserProfile
+from FoodCaloEstimate.iam.utils.calculate_calorie_limit import calculate_calorie_limit
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
@@ -45,6 +46,8 @@ class UserProfileSerializer(serializers.ModelSerializer):
         return filtered_qs.aggregate(total=Sum("calo"))["total"] or 0.0
 
     class Meta:
+        """Meta class."""
+
         model = UserProfile
         fields = [
             "gender",
@@ -68,7 +71,17 @@ class UserProfileSerializer(serializers.ModelSerializer):
         }
 
     def update(self, instance, validated_data):
+        """Update."""
         if validated_data.pop("auto_set_calorie_limit", False):
-            validated_data["calorie_limit"] = instance.calculate_auto_calorie_limit()
+            validated_data["calorie_limit"] = calculate_calorie_limit(
+                validated_data.get("gender", instance.gender),
+                validated_data.get("age", instance.age),
+                validated_data.get("height", instance.height),
+                validated_data.get("weight", instance.weight),
+                validated_data.get(
+                    "calorie_limit_period", instance.calorie_limit_period
+                ),
+                instance.calorie_limit,
+            )
 
         return super().update(instance, validated_data)
