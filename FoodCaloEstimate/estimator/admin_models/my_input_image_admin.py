@@ -66,7 +66,7 @@ class MyInputImageAdmin(ChartAdminModel):
         "created_at",
         "updated_at",
         "staff",
-        "comment",
+        # "comment",
         "calo",
         "is_deleted",
     )

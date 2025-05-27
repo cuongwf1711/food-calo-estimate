@@ -26,7 +26,6 @@ from FoodCaloEstimate.estimator.view_filters.input_image_filter import (
 class InputImageViewSet(viewsets.ModelViewSet):
     """Input Image View Set."""
 
-    queryset = MyInputImage.objects.filter(is_deleted=False)
     serializer_class = InputImageSerializer
     permission_classes = [permissions.IsAuthenticated]
     http_method_names = ["get", "post", "patch", "delete"]
@@ -34,6 +33,10 @@ class InputImageViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend, OrderingFilter]
     filterset_class = InputImageFilter
     ordering_fields = ["calo", "created_at"]
+
+    def get_queryset(self):
+        """Get queryset."""
+        return MyInputImage.objects.filter(is_deleted=False, user=self.request.user)
 
     def destroy(self, request, *args, **kwargs):
         """Soft delete the input image."""

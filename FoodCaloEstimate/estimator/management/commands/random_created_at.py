@@ -14,6 +14,8 @@ from django.utils import timezone
 from FoodCaloEstimate.estimator.models.my_input_image import MyInputImage
 
 DAYS_AGO = 7
+BATCH_SIZE = 1000
+update_fields = ["created_at", "updated_at", "deleted_at"]
 
 
 def random_datetime_between(start, end):
@@ -26,28 +28,30 @@ def random_datetime_between(start, end):
 
 
 def shuffle_timestamps():
-    """Shuffle timestamps."""
     now = timezone.now()
-    month_ago = now - timedelta(days=DAYS_AGO)
+    cutoff = now - timedelta(days=DAYS_AGO)
 
-    for img in MyInputImage.objects.all():
-        # pick new created_at
-        new_created = random_datetime_between(month_ago, now)
+    qs = MyInputImage.objects.select_related("user").all()
+    batch = []
 
-        # pick new updated_at (>= created_at, <= now)
-        new_updated = random_datetime_between(new_created, now)
+    for img in qs.iterator(chunk_size=BATCH_SIZE):
+        # tính earliest_time không trước ngày user tạo và không quá DAYS_AGO trước
+        earliest = max(cutoff, img.user.date_joined)
 
-        # determine deleted_at
-        if img.is_deleted:
-            # deleted_at between created_at and now
-            new_deleted = random_datetime_between(new_created, now)
-        else:
-            new_deleted = None
-
-        # apply via QuerySet.update to bypass auto_now / auto_now_add
-        MyInputImage.objects.filter(pk=img.pk).update(
-            created_at=new_created, updated_at=new_updated, deleted_at=new_deleted
+        img.created_at = random_datetime_between(earliest, now)
+        img.updated_at = random_datetime_between(img.created_at, now)
+        img.deleted_at = (
+            random_datetime_between(img.created_at, now) if img.is_deleted else None
         )
+
+        batch.append(img)
+        if len(batch) >= BATCH_SIZE:
+            MyInputImage.objects.bulk_update(batch, update_fields)
+            batch.clear()
+
+    # bulk_update phần còn lại
+    if batch:
+        MyInputImage.objects.bulk_update(batch, update_fields)
 
 
 class Command(BaseCommand):  # random_created_at
