@@ -56,6 +56,7 @@ class EmailService:
 
     def send(self):
         """Send."""
+        # FIXME: Remove this print statement in production
         print(self.context)
         return
         self._build_context()

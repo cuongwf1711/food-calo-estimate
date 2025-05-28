@@ -5,7 +5,7 @@
 
 """Parameter Constants."""
 
-# FIXME; Adjust to fit the production in the future
+# FIXME: Adjust to fit the production in the future
 
 import torch
 

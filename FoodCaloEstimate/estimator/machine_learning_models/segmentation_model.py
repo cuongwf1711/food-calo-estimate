@@ -9,8 +9,10 @@ from tempfile import NamedTemporaryFile
 
 import numpy as np
 import torch
+
 # from dds_cloudapi_sdk import Client, Config
 from dds_cloudapi_sdk.tasks.v2_task import V2Task
+
 # from django.conf import settings
 from PIL import Image
 from sam2.build_sam import build_sam2
@@ -41,6 +43,7 @@ from FoodCaloEstimate.estimator.constants.parameter_constants import (
 from FoodCaloEstimate.estimator.services.machine_leaning_service import (
     MachineLearningService,
 )
+
 # from FoodCaloEstimate.estimator.utils.clear_data import clear_data
 from FoodCaloEstimate.estimator.utils.custom_decorator import time_measure
 
@@ -118,7 +121,7 @@ class SegmentationModel:
     @torch.inference_mode()
     def get_area_food_from_text_prompt(self, input_image):
         """Get area food from text prompt."""
-        # FIXME; Adjust to fit the production in the future
+        # FIXME: Adjust to fit the production in the future
 
         multimask_output = True
         with Image.open(input_image) as image:
