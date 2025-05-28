@@ -10,7 +10,7 @@ FORMAT_IMAGE = "jpeg"
 
 UNKNOWN = "unknown"
 UNKNOWN_INDEX = -1
-UNKNOWN_CALO = -1
+UNKNOWN_CALO = 0
 
 # Image keywords
 ORIGIN_IMAGE = "origin_image"

@@ -15,7 +15,6 @@ from FoodCaloEstimate.estimator.constants.parameter_constants import (
     DEVICE,
     NUM_CLASSES,
 )
-from FoodCaloEstimate.estimator.utils.clear_data import clear_data
 from FoodCaloEstimate.estimator.utils.custom_decorator import time_measure
 
 
@@ -65,7 +64,7 @@ class ClassificationModel:
         confidence_score = confidence_score.item()
         predicted_idx = predicted_idx.item()
 
-        clear_data(tensor_batch, raw_logits, probabilities)
+        # clear_data(tensor_batch, raw_logits, probabilities)
 
         if confidence_score < confidence_threshold:
             return 1 - confidence_score, -1

@@ -10,7 +10,11 @@ from io import BytesIO
 import numpy as np
 from PIL import Image
 
-from FoodCaloEstimate.estimator.constants.image_constants import FORMAT_IMAGE
+from FoodCaloEstimate.estimator.constants.image_constants import (
+    FORMAT_IMAGE,
+    UNKNOWN_CALO,
+    UNKNOWN_INDEX,
+)
 from FoodCaloEstimate.estimator.constants.parameter_constants import (
     TEXT_PROMPT_LIST,
     THRESHHOLD_PIXEL_REFERENCE_POINT_AREA,
@@ -29,6 +33,8 @@ class MachineLearningService:
         REFERENCE_POINT_REAL_AREA: float,
     ) -> float:
         """Calculate calories."""
+        if label == UNKNOWN_INDEX:
+            return UNKNOWN_CALO
         if reference_point_pixel_area < THRESHHOLD_PIXEL_REFERENCE_POINT_AREA:
             return FoodDictionary.get_calories(label)
         return (

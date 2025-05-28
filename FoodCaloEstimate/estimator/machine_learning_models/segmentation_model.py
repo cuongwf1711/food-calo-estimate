@@ -9,9 +9,9 @@ from tempfile import NamedTemporaryFile
 
 import numpy as np
 import torch
-from dds_cloudapi_sdk import Client, Config
+# from dds_cloudapi_sdk import Client, Config
 from dds_cloudapi_sdk.tasks.v2_task import V2Task
-from django.conf import settings
+# from django.conf import settings
 from PIL import Image
 from sam2.build_sam import build_sam2
 from sam2.sam2_image_predictor import SAM2ImagePredictor
@@ -41,7 +41,7 @@ from FoodCaloEstimate.estimator.constants.parameter_constants import (
 from FoodCaloEstimate.estimator.services.machine_leaning_service import (
     MachineLearningService,
 )
-from FoodCaloEstimate.estimator.utils.clear_data import clear_data
+# from FoodCaloEstimate.estimator.utils.clear_data import clear_data
 from FoodCaloEstimate.estimator.utils.custom_decorator import time_measure
 
 # from FoodCaloEstimate.estimator.utils.run_try__loop_funcs import run_try_loop_funcs
@@ -64,7 +64,7 @@ class SegmentationModel:
             .to(DEVICE)
         )
 
-        self.dds_client = Client(Config(settings.API_KEY_DINOX))
+        # self.dds_client = Client(Config(settings.API_KEY_DINOX))
 
         self.SAM2_PREDICTOR = SAM2ImagePredictor(
             build_sam2(SAM2_CONFIG, SAM2_CHECKPOINT, device=DEVICE)
@@ -86,7 +86,7 @@ class SegmentationModel:
             text_threshold=TEXT_THRESHOLD,
             target_sizes=[image.size[::-1]],
         )
-        clear_data(inputs, outputs)
+        # clear_data(inputs, outputs)
         print(results)
         return results[0]["boxes"].cpu().numpy(), results[0]["text_labels"]
 
@@ -107,9 +107,11 @@ class SegmentationModel:
         return (
             all_masks
             if all_masks.ndim > 3
-            else all_masks[np.newaxis]
-            if multimask_output
-            else all_masks[:, np.newaxis, :, :]
+            else (
+                all_masks[np.newaxis]
+                if multimask_output
+                else all_masks[:, np.newaxis, :, :]
+            )
         )
 
     @time_measure
@@ -144,7 +146,7 @@ class SegmentationModel:
         overlay = MachineLearningService.get_overlay_image(
             image, final_masks, text_labels
         )
-        clear_data(all_masks, final_masks)
+        # clear_data(all_masks, final_masks)
         return overlay, category_areas.values()
 
     @time_measure

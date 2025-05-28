@@ -27,10 +27,8 @@ class SignupEmailSerializer(serializers.Serializer):
 
         try:
             if User.objects.get(username=email):
-                print("Existed account")
                 raise serializers.ValidationError(EXISTED_ACOUNT)
         except User.DoesNotExist:
-            print("Not existed account")
             attrs["otp"] = set_otp_to_redis_or_raise_exception(email)
         return super().validate(attrs)
 

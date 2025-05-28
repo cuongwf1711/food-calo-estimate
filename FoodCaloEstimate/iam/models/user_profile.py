@@ -63,21 +63,21 @@ class UserProfile(UUIDModel, AutoTimeStampedModel):
     )
 
     @property
-    def length_reference_point(self) -> Decimal:
+    def length_reference_point(self) -> float:
         """Length reference point."""
         if self.length_reference_point_custom is not None:
-            return self.length_reference_point_custom
-        return Decimal(DEFAULT_LENGTH_REFERENCE_POINT)
+            return float(self.length_reference_point_custom)
+        return float(DEFAULT_LENGTH_REFERENCE_POINT)
 
     @property
-    def width_reference_point(self) -> Decimal:
+    def width_reference_point(self) -> float:
         """Width reference point."""
         if self.width_reference_point_custom is not None:
-            return self.width_reference_point_custom
-        return Decimal(DEFAULT_WIDTH_REFERENCE_POINT)
+            return float(self.width_reference_point_custom)
+        return float(DEFAULT_WIDTH_REFERENCE_POINT)
 
     @property
-    def area_reference_point(self) -> Decimal:
+    def area_reference_point(self) -> float:
         """Area reference point."""
         return self.length_reference_point * self.width_reference_point
 

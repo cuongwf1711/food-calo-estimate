@@ -5,7 +5,6 @@
 
 """Input Image Serializer."""
 
-import io
 
 from rest_framework import serializers
 
@@ -28,7 +27,6 @@ from FoodCaloEstimate.estimator.services.image_service import ImageService
 from FoodCaloEstimate.estimator.services.machine_leaning_service import (
     MachineLearningService,
 )
-from FoodCaloEstimate.estimator.utils.clear_data import clear_data
 from FoodCaloEstimate.queue_tasks import run_parallel_tasks_in_queue
 
 
@@ -95,19 +93,19 @@ class InputImageSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         """Create."""
 
-        validated_data.clear()
-        validated_data["user"] = self.context["request"].user
-        validated_data["confidence"], validated_data["predict"] = 1, 1
-        validated_data["calo"] = 100
-        validated_data["url"] = {
-            ORIGIN_IMAGE: {
-                DEFAULT_URL: "https://res.cloudinary.com/dp18ugn5e/image/upload/v1747580368/wv6ojtrfh6ybayiyjhgc.jpg",
-            },
-            SEGMENTATION_IMAGE: {
-                DEFAULT_URL: "https://res.cloudinary.com/dp18ugn5e/image/upload/v1747581467/t0v4ur5v06sf7xlpjqb1.jpg",
-            },
-        }
-        return super().create(validated_data)
+        # validated_data.clear()
+        # validated_data["user"] = self.context["request"].user
+        # validated_data["confidence"], validated_data["predict"] = 1, 1
+        # validated_data["calo"] = 100
+        # validated_data["url"] = {
+        #     ORIGIN_IMAGE: {
+        #         DEFAULT_URL: "https://res.cloudinary.com/dp18ugn5e/image/upload/v1747580368/wv6ojtrfh6ybayiyjhgc.jpg",
+        #     },
+        #     SEGMENTATION_IMAGE: {
+        #         DEFAULT_URL: "https://res.cloudinary.com/dp18ugn5e/image/upload/v1747581467/t0v4ur5v06sf7xlpjqb1.jpg",
+        #     },
+        # }
+        # return super().create(validated_data)
 
         image_file = validated_data["image_file"]
         validated_data.clear()
@@ -127,15 +125,13 @@ class InputImageSerializer(serializers.ModelSerializer):
         )
 
         image_file.seek(0)
-        image_byteio = io.BytesIO(image_file.read())
         user = self.context["request"].user
-
         (
             origin_image_cloudinary,
             segmentation_image_cloudinary,
             validated_data["calo"],
         ) = run_parallel_tasks_in_queue(
-            (ImageService.upload_image, (image_byteio, ORIGIN_IMAGE, UNKNOWN), {}),
+            (ImageService.upload_image, (image_file.read(), ORIGIN_IMAGE, UNKNOWN), {}),
             (
                 ImageService.upload_image,
                 (segmentation_image_byteio, SEGMENTATION_IMAGE, UNKNOWN),
@@ -153,43 +149,13 @@ class InputImageSerializer(serializers.ModelSerializer):
             ),
         )
 
-        # upload image to local
-        # (
-        #     (origin_image_cloudinary, origin_image_local),
-        #     (segmentation_image_cloudinary, segmentation_image_local),
-        #     validated_data["calo"],
-        # ) = run_parallel_tasks_in_queue(
-        #     (ImageService.upload_image, (image_byteio, ORIGIN_IMAGE, UNKNOWN), {}),
-        #     (
-        #         ImageService.upload_image,
-        #         (segmentation_image_byteio, SEGMENTATION_IMAGE, UNKNOWN),
-        #         {},
-        #     ),
-        #     (
-        #         MachineLearningService.calculate_calories,
-        #         (
-        #             validated_data["predict"],
-        #             food_pixel_area,
-        #             reference_point_pixel_area,
-        #         ),
-        #         {},
-        #     ),
-        # )
-        image_byteio.close()
         segmentation_image_byteio.close()
 
         validated_data["url"] = {
-            ORIGIN_IMAGE: {
-                **origin_image_cloudinary,
-                # **origin_image_local,
-            },
-            SEGMENTATION_IMAGE: {
-                **segmentation_image_cloudinary,
-                # **segmentation_image_local,
-            },
+            ORIGIN_IMAGE: origin_image_cloudinary,
+            SEGMENTATION_IMAGE: segmentation_image_cloudinary,
         }
         validated_data["user"] = user
-        clear_data()
         return super().create(validated_data)
 
     def update(self, instance, validated_data):
