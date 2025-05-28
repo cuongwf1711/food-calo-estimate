@@ -12,7 +12,7 @@ import torch
 NUM_CLASSES = 37
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(f"Using device: {DEVICE}")
-DEFAULT_CONFIDENCE_THRESHOLD = 0.7
+DEFAULT_CONFIDENCE_CLASSIFICATION_THRESHOLD = 0.8
 
 # Segmentation Model
 REFERENCE_POINT = "finger"

@@ -11,7 +11,7 @@ from django.core.files.uploadedfile import InMemoryUploadedFile
 from PIL import Image
 
 from FoodCaloEstimate.estimator.constants.parameter_constants import (
-    DEFAULT_CONFIDENCE_THRESHOLD,
+    DEFAULT_CONFIDENCE_CLASSIFICATION_THRESHOLD,
     DEVICE,
     NUM_CLASSES,
 )
@@ -47,7 +47,7 @@ class ClassificationModel:
     def predict(
         self,
         input_image: InMemoryUploadedFile,
-        confidence_threshold: float = DEFAULT_CONFIDENCE_THRESHOLD,
+        confidence_threshold: float = DEFAULT_CONFIDENCE_CLASSIFICATION_THRESHOLD,
     ) -> int:
         """Predict."""
         # Preprocess the input image

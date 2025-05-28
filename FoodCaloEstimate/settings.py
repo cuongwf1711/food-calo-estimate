@@ -215,7 +215,7 @@ STATIC_URL = "static/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media/")
 MEDIA_URL = "/media/"
 MAIN_URL = config("MAIN_URL", default="http://localhost:8000")
-MAIN_MEDIA_URL = MAIN_URL + MEDIA_URL
+MAIN_MEDIA_URL = MAIN_URL + MEDIA_URL  # type: ignore
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

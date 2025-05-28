@@ -5,6 +5,7 @@
 
 """Segmentation Model."""
 
+from io import BytesIO
 from tempfile import NamedTemporaryFile
 
 import numpy as np
@@ -124,16 +125,19 @@ class SegmentationModel:
         # FIXME: Adjust to fit the production in the future
 
         multimask_output = True
+        category_areas = {category: 0 for category in TEXT_PROMPT_LIST}
         with Image.open(input_image) as image:
             input_boxes, text_labels = self._get_boxes_groundino(image)
 
+            if len(input_boxes) == 0:
+                input_image.seek(0)
+                return BytesIO(input_image.read()), category_areas.values()
             # input_boxes, text_labels = run_try_loop_funcs(
             #     [self._get_boxes_dinox, self._get_boxes_groundino], image
             # )
             all_masks = self._get_masks(image, input_boxes, multimask_output)
 
         final_masks = []
-        category_areas = {category: 0 for category in TEXT_PROMPT_LIST}
         for idx, mset in enumerate(all_masks):
             if multimask_output:
                 mset_sum = mset.reshape(mset.shape[0], -1).sum(axis=1)
