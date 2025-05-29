@@ -32,7 +32,7 @@ class MyInputImagePagination(PageNumberPagination):
                 "count": self.page.paginator.count,
                 "next": self.get_next_link(),
                 "previous": self.get_previous_link(),
-                "total_calories": self.get_total_calories(),
+                "total_calories": round(self.get_total_calories(), 2),
                 "results": data,
             }
         )

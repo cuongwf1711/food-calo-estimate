@@ -81,10 +81,10 @@ class SegmentationModel:
         inputs = self.processor(
             images=image, text=TEXT_PROMPT_LIST, return_tensors="pt"
         ).to(DEVICE)
-        outputs = self.grounding_dino_model(**inputs)
+        # outputs = self.grounding_dino_model(**inputs)
 
         results = self.processor.post_process_grounded_object_detection(
-            outputs,
+            self.grounding_dino_model(**inputs),
             inputs.input_ids,
             box_threshold=BOX_THRESHOLD_GROUND_DINO,
             text_threshold=TEXT_THRESHOLD,
@@ -99,7 +99,7 @@ class SegmentationModel:
     def _get_masks(self, image, input_boxes, multimask_output=False):
         """Get masks."""
         with autocast(device_type=DEVICE.type, dtype=torch.bfloat16):
-            self.SAM2_PREDICTOR.set_image(np.array(image.convert("RGB")))
+            self.SAM2_PREDICTOR.set_image(np.array(image))
             all_masks, _, _ = self.SAM2_PREDICTOR.predict(
                 point_coords=None,
                 point_labels=None,
@@ -126,7 +126,7 @@ class SegmentationModel:
 
         multimask_output = True
         category_areas = {category: 0 for category in TEXT_PROMPT_LIST}
-        with Image.open(input_image) as image:
+        with Image.open(input_image).convert("RGB") as image:
             input_boxes, text_labels = self._get_boxes_groundino(image)
 
             if len(input_boxes) == 0:
