@@ -93,19 +93,19 @@ class InputImageSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         """Create."""
 
-        validated_data.clear()
-        validated_data["user"] = self.context["request"].user
-        validated_data["confidence"], validated_data["predict"] = 1, 1
-        validated_data["calo"] = 100
-        validated_data["url"] = {
-            ORIGIN_IMAGE: {
-                DEFAULT_URL: "https://res.cloudinary.com/dp18ugn5e/image/upload/v1748492126/rmd9vc5jdskfmtxdcepb.jpg",
-            },
-            SEGMENTATION_IMAGE: {
-                DEFAULT_URL: "https://res.cloudinary.com/dp18ugn5e/image/upload/v1748492126/pbuvf0trfohfs25du5kn.jpg",
-            },
-        }
-        return super().create(validated_data)
+        # validated_data.clear()
+        # validated_data["user"] = self.context["request"].user
+        # validated_data["confidence"], validated_data["predict"] = 1, 1
+        # validated_data["calo"] = 100
+        # validated_data["url"] = {
+        #     ORIGIN_IMAGE: {
+        #         DEFAULT_URL: "https://res.cloudinary.com/dp18ugn5e/image/upload/v1748492126/rmd9vc5jdskfmtxdcepb.jpg",
+        #     },
+        #     SEGMENTATION_IMAGE: {
+        #         DEFAULT_URL: "https://res.cloudinary.com/dp18ugn5e/image/upload/v1748492126/pbuvf0trfohfs25du5kn.jpg",
+        #     },
+        # }
+        # return super().create(validated_data)
 
         image_file = validated_data["image_file"]
         validated_data.clear()

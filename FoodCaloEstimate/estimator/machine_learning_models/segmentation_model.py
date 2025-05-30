@@ -44,8 +44,6 @@ from FoodCaloEstimate.estimator.constants.parameter_constants import (
 from FoodCaloEstimate.estimator.services.machine_leaning_service import (
     MachineLearningService,
 )
-
-# from FoodCaloEstimate.estimator.utils.clear_data import clear_data
 from FoodCaloEstimate.estimator.utils.custom_decorator import time_measure
 
 # from FoodCaloEstimate.estimator.utils.run_try__loop_funcs import run_try_loop_funcs
@@ -57,6 +55,20 @@ class SegmentationModel:
     @time_measure
     def __init__(self):
         """Init."""
+        # Constants
+        self.device = DEVICE
+        self.text_prompt = TEXT_PROMPT
+        self.text_prompt_list = TEXT_PROMPT_LIST
+        self.box_threshold_dinox = BOX_THRESHOLD_DINOX
+        self.box_threshold_ground_dino = BOX_THRESHOLD_GROUND_DINO
+        self.iou_threshold = IOU_THRESHOLD
+        self.text_threshold = TEXT_THRESHOLD
+        self.format_image = FORMAT_IMAGE
+        self.dinox_api_path = DINOX_API_PATH
+        self.dinox_model = DINOX_MODEL
+        self.dtype_optimize_cuda = torch.bfloat16
+        # self.dds_client = Client(Config(settings.API_KEY_DINOX))
+
         if torch.backends.cuda.is_built() and torch.cuda.is_available():
             torch.backends.cuda.matmul.allow_tf32 = True
             torch.backends.cudnn.allow_tf32 = True
@@ -65,40 +77,37 @@ class SegmentationModel:
         self.grounding_dino_model = (
             AutoModelForZeroShotObjectDetection.from_pretrained(GROUNDING_DINO_MODEL)
             .eval()
-            .to(DEVICE)
+            .to(self.device)
         )
 
-        # self.dds_client = Client(Config(settings.API_KEY_DINOX))
-
         self.SAM2_PREDICTOR = SAM2ImagePredictor(
-            build_sam2(SAM2_CONFIG, SAM2_CHECKPOINT, device=DEVICE)
+            build_sam2(SAM2_CONFIG, SAM2_CHECKPOINT, device=self.device)  # type: ignore
         )
 
     @time_measure
     @torch.inference_mode()
     def _get_boxes_groundino(self, image):
         """Get boxes."""
-        inputs = self.processor(
-            images=image, text=TEXT_PROMPT_LIST, return_tensors="pt"
-        ).to(DEVICE)
-        # outputs = self.grounding_dino_model(**inputs)
+        with autocast(device_type=self.device.type, dtype=self.dtype_optimize_cuda):
+            inputs = self.processor(
+                images=image, text=self.text_prompt_list, return_tensors="pt"
+            ).to(self.device)
 
-        results = self.processor.post_process_grounded_object_detection(
-            self.grounding_dino_model(**inputs),
-            inputs.input_ids,
-            box_threshold=BOX_THRESHOLD_GROUND_DINO,
-            text_threshold=TEXT_THRESHOLD,
-            target_sizes=[image.size[::-1]],
-        )
-        # clear_data(inputs, outputs)
-        print(results)
-        return results[0]["boxes"].cpu().numpy(), results[0]["text_labels"]
+            results = self.processor.post_process_grounded_object_detection(
+                self.grounding_dino_model(**inputs),
+                inputs.input_ids,
+                box_threshold=self.box_threshold_ground_dino,
+                text_threshold=self.text_threshold,
+                target_sizes=[image.size[::-1]],
+            )
+            print(results)
+            return results[0]["boxes"].cpu().numpy(), results[0]["text_labels"]
 
     @time_measure
     @torch.inference_mode()
     def _get_masks(self, image, input_boxes, multimask_output=False):
         """Get masks."""
-        with autocast(device_type=DEVICE.type, dtype=torch.bfloat16):
+        with autocast(device_type=self.device.type, dtype=self.dtype_optimize_cuda):
             self.SAM2_PREDICTOR.set_image(np.array(image))
             all_masks, _, _ = self.SAM2_PREDICTOR.predict(
                 point_coords=None,
@@ -125,7 +134,7 @@ class SegmentationModel:
         # FIXME: Adjust to fit the production in the future
 
         multimask_output = True
-        category_areas = {category: 0 for category in TEXT_PROMPT_LIST}
+        category_areas = {category: 0.0 for category in self.text_prompt_list}
         with Image.open(input_image).convert("RGB") as image:
             input_boxes, text_labels = self._get_boxes_groundino(image)
 
@@ -153,36 +162,37 @@ class SegmentationModel:
         overlay = MachineLearningService.get_overlay_image(
             image, final_masks, text_labels
         )
-        # clear_data(all_masks, final_masks)
         return overlay, category_areas.values()
 
     @time_measure
     @torch.inference_mode()
     def _get_boxes_dinox(self, image):
         """Get boxes use dinox."""
-        with NamedTemporaryFile(suffix=f".{FORMAT_IMAGE}") as temp_file:
+        with NamedTemporaryFile(suffix=f".{self.format_image}") as temp_file:
             temp_filename = temp_file.name
-            image.save(temp_filename, format=FORMAT_IMAGE, quality=100, optimize=True)
-            infer_image_url = self.dds_client.upload_file(temp_filename)
+            image.save(
+                temp_filename, format=self.format_image, quality=100, optimize=True
+            )
+            infer_image_url = self.dds_client.upload_file(temp_filename)  # type: ignore
 
         task = V2Task(
-            api_path=DINOX_API_PATH,
+            api_path=self.dinox_api_path,
             api_body={
-                "model": DINOX_MODEL,
+                "model": self.dinox_model,
                 "image": infer_image_url,
                 "prompt": {
                     "type": "text",
-                    "text": TEXT_PROMPT,
+                    "text": self.text_prompt,
                 },
                 "targets": ["bbox"],
-                "bbox_threshold": BOX_THRESHOLD_DINOX,
-                "iou_threshold": IOU_THRESHOLD,
+                "bbox_threshold": self.box_threshold_dinox,
+                "iou_threshold": self.iou_threshold,
             },
         )
 
-        self.dds_client.run_task(task)
-        print(task.result["objects"])
+        self.dds_client.run_task(task)  # type: ignore
+        print(task.result["objects"])  # type: ignore
         bboxes, labels = zip(
-            *((obj["bbox"], obj["category"]) for obj in task.result["objects"])
+            *((obj["bbox"], obj["category"]) for obj in task.result["objects"])  # type: ignore
         )
         return np.array(bboxes), list(labels)

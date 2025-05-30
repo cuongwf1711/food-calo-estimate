@@ -36,11 +36,11 @@ class MachineLearningService:
         if label == UNKNOWN_INDEX:
             return UNKNOWN_CALO
         if reference_point_pixel_area < THRESHHOLD_PIXEL_REFERENCE_POINT_AREA:
-            return FoodDictionary.get_calories(label)  # type: ignore
+            return FoodDictionary.get_calories(label) * 100  # type: ignore
         return round(
             food_pixel_area
             * (REFERENCE_POINT_REAL_AREA / reference_point_pixel_area)
-            * (FoodDictionary.get_calories(label) / 100),  # type: ignore
+            * FoodDictionary.get_calories(label),  # type: ignore
             2,
         )
 
