@@ -13,6 +13,8 @@ from django.utils import timezone
 from FoodCaloEstimate.estimator.models.my_input_image import MyInputImage
 from FoodCaloEstimate.iam.constants.period_choices import MONTH_FORMAT, TimePeriod
 
+MAX_WEEK = 9999
+
 
 class InputImageFilter(django_filters.FilterSet):
     """Input Image Filter."""
@@ -37,7 +39,7 @@ class InputImageFilter(django_filters.FilterSet):
             idx = int(idx)
         except:
             return queryset.none()
-        if idx < 0:
+        if idx < 0 or idx >= MAX_WEEK:
             return queryset.none()
 
         today = timezone.now().date()
