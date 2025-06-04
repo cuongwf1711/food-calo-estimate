@@ -20,6 +20,7 @@ from FoodCaloEstimate.estimator.constants.parameter_constants import (
     THRESHHOLD_PIXEL_REFERENCE_POINT_AREA,
 )
 from FoodCaloEstimate.estimator.services.food_dictionany_service import FoodDictionary
+from FoodCaloEstimate.estimator.utils.custom_decorator import time_measure
 
 
 class MachineLearningService:
@@ -45,9 +46,9 @@ class MachineLearningService:
         )
 
     @staticmethod
+    @time_measure
     def get_overlay_image(image, masks, labels):
         """Get overlay image."""
-        result_image = image.copy()
         SEGMENTATION_COLORS = {
             label: np.concatenate([np.random.random(3), [0.6]])
             for label in TEXT_PROMPT_LIST
@@ -68,9 +69,9 @@ class MachineLearningService:
             mask_alpha = Image.fromarray(mask_alpha, mode="L")
             mask_image.putalpha(mask_alpha)
 
-            result_image.paste(mask_image, (0, 0), mask_alpha)
+            image.paste(mask_image, (0, 0), mask_alpha)
 
         buffer = BytesIO()
-        result_image.save(buffer, format=FORMAT_IMAGE, quality=100)
+        image.save(buffer, format=FORMAT_IMAGE)
         buffer.seek(0)
         return buffer

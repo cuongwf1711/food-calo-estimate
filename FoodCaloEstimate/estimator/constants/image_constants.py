@@ -5,7 +5,7 @@
 
 """Image Constants."""
 
-MAX_IMAGE_SIZE = 50 * 1024 * 1024  # 50MB
+MAX_IMAGE_SIZE = 10 * 1024 * 1024  # 10 MB
 FORMAT_IMAGE = "jpeg"
 
 UNKNOWN = "unknown"
