@@ -44,7 +44,7 @@ class AbstractInputImage(AutoTimeStampedModel, UUIDModel, SoftDeleteModel):
     @property
     def confidence_percentage(self):
         """Return confidence as a formatted percentage."""
-        return f"{self.confidence * 100:.2f}%"
+        return f"{self.confidence * 100:.2f}".rstrip("0").rstrip(".") + "%"
 
     class Meta:
         """Meta class for AbstractInputImage."""
