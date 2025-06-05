@@ -175,6 +175,7 @@ SIMPLE_JWT = {
     "REFRESH_TOKEN_LIFETIME": timedelta(days=30),
     "CHECK_REVOKE_TOKEN": True,
     "REVOKE_TOKEN_CLAIM": "changed_pw",
+    "TOKEN_VERIFY_SERIALIZER": "FoodCaloEstimate.iam.serializers.custom_token_verify_serializer.CustomTokenVerifySerializer",
 }
 
 SPECTACULAR_SETTINGS = {
@@ -257,6 +258,7 @@ CELERY_ACCEPT_CONTENT = ["json", "pickle"]
 CLOUDINARY_CLOUD_NAME = config("CLOUDINARY_CLOUD_NAME", "")
 CLOUDINARY_API_KEY = config("CLOUDINARY_API_KEY", "")
 CLOUDINARY_API_SECRET = config("CLOUDINARY_API_SECRET", "")
+PREFIX_PUBLIC_CLOUDINARY_URL = config("PREFIX_PUBLIC_CLOUDINARY_URL", "")
 
 # API_KEY_DINOX
 API_KEY_DINOX = config("API_KEY_DINOX", "")

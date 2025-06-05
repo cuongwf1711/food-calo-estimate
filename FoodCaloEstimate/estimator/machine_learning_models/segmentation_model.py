@@ -171,7 +171,7 @@ class SegmentationModel:
             )
         )
 
-    @time_measure
+    # @time_measure
     @torch.inference_mode()
     def get_area_food_from_text_prompt(self, input_image):
         """
@@ -213,6 +213,7 @@ class SegmentationModel:
         )
         return overlay, category_areas.values()
 
+    # @time_measure
     def _process_masks_and_calculate_areas(
         self, all_masks, text_labels, category_areas, multimask_output
     ):
@@ -301,10 +302,13 @@ class SegmentationModel:
 
         # Execute API request and get results
         self.dds_client.run_task(task)  # type: ignore
-        print(task.result["objects"])  # type: ignore
+        result = task.result["objects"]  # type: ignore
+        print(result)
+
+        if not result:
+            # If no objects detected, return empty arrays
+            return np.array([]), []
 
         # Extract bounding boxes and labels from API response
-        bboxes, labels = zip(
-            *((obj["bbox"], obj["category"]) for obj in task.result["objects"])  # type: ignore
-        )
+        bboxes, labels = zip(*((obj["bbox"], obj["category"]) for obj in result))
         return np.array(bboxes), list(labels)

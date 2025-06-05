@@ -18,6 +18,7 @@ from FoodCaloEstimate.estimator.constants.image_constants import (
     ORIGIN_IMAGE,
     SEGMENTATION_IMAGE,
 )
+from FoodCaloEstimate.estimator.utils.custom_decorator import time_measure
 
 
 class CloudinaryService:
@@ -30,11 +31,13 @@ class CloudinaryService:
         secure=True,
     )
 
-    def upload_image(self, image, *folder):
+    @time_measure
+    def upload_image(self, image, public_id, *folder):
         """Upload image to folder."""
         asset_folder = os.path.join(*folder)
         response = cloudinary.uploader.upload(
             file=image,
+            public_id=public_id,
             asset_folder=asset_folder,
         )
         return {

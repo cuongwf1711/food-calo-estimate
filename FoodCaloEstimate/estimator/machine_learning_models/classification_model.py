@@ -44,7 +44,7 @@ class ClassificationModel:
             **data_config, is_training=False
         )
 
-    @time_measure
+    # @time_measure
     @torch.inference_mode()
     @autocast(**OPTIMIZE_AUTOCAST_PARAMETERS)
     def predict(

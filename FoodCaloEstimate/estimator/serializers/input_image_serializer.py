@@ -6,10 +6,13 @@
 """Input Image Serializer."""
 
 
+from pathlib import Path
+
 from rest_framework import serializers
 
 from FoodCaloEstimate.estimator.constants.image_constants import (
     DEFAULT_URL,
+    FORMAT_IMAGE,
     MAX_IMAGE_SIZE,
     ORIGIN_IMAGE,
     SEGMENTATION_IMAGE,
@@ -27,7 +30,6 @@ from FoodCaloEstimate.estimator.services.image_service import ImageService
 from FoodCaloEstimate.estimator.services.machine_leaning_service import (
     MachineLearningService,
 )
-from FoodCaloEstimate.queue_tasks import run_parallel_tasks_in_queue
 
 
 class InputImageSerializer(serializers.ModelSerializer):
@@ -126,27 +128,20 @@ class InputImageSerializer(serializers.ModelSerializer):
 
         image_file.seek(0)
         user = self.context["request"].user
-        (
-            origin_image_cloudinary,
-            segmentation_image_cloudinary,
-            validated_data["calo"],
-        ) = run_parallel_tasks_in_queue(
-            (ImageService.upload_image, (image_file.read(), ORIGIN_IMAGE, UNKNOWN), {}),
-            (
-                ImageService.upload_image,
-                (segmentation_image_byteio, SEGMENTATION_IMAGE, UNKNOWN),
-                {},
-            ),
-            (
-                MachineLearningService.calculate_calories,
-                (
-                    validated_data["predict"],
-                    food_pixel_area,
-                    reference_point_pixel_area,
-                    user.userprofile.area_reference_point,
-                ),
-                {},
-            ),
+        origin_image_cloudinary = ImageService.upload_image(
+            image_file.read(),
+            Path(image_file.name).suffix.strip("."),
+            ORIGIN_IMAGE,
+            UNKNOWN,
+        )
+        segmentation_image_cloudinary = ImageService.upload_image(
+            segmentation_image_byteio, FORMAT_IMAGE, SEGMENTATION_IMAGE, UNKNOWN
+        )
+        validated_data["calo"] = MachineLearningService.calculate_calories(
+            validated_data["predict"],
+            food_pixel_area,
+            reference_point_pixel_area,
+            user.userprofile.area_reference_point,
         )
 
         validated_data["url"] = {

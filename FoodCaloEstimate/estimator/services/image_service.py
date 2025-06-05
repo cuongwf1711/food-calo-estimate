@@ -1,30 +1,53 @@
+# Copyright (C)
+# date: 05-06-2025
+# author: cuongwf1711
+# email: ruivalien@gmail.com
+
 """Image Service."""
+
+from pathlib import Path
+from urllib.parse import urljoin
+
+from django.conf import settings
 
 from FoodCaloEstimate.estimator.constants.image_constants import (
     CLOUDINARY_PUBLIC_ID,
+    CLOUDINARY_SECURE_URL,
     ORIGIN_IMAGE,
     SEGMENTATION_IMAGE,
 )
 from FoodCaloEstimate.estimator.services.cloudinary_service import CloudinaryService
 from FoodCaloEstimate.estimator.services.food_dictionany_service import FoodDictionary
+from FoodCaloEstimate.estimator.utils.generate_unique_filename import (
+    generate_unique_filename,
+)
+from FoodCaloEstimate.queue_tasks import run_task_in_queue
 
 
 class ImageService:
     """Image Service."""
 
     @staticmethod
-    def upload_image(image_byteio, *folder):
+    def upload_image(image_byteio, extension, *folder):
         """Upload image."""
-        cloudinary_storage_image = CloudinaryService().upload_image(
+        public_id = Path(generate_unique_filename(extension=extension)).stem
+        run_task_in_queue(
+            CloudinaryService().upload_image,
             image_byteio,
+            public_id,
             *folder,
         )
-        # local_storage_image = LocalStorageService().upload_image(
-        #     image_byteio,
-        #     *folder,
-        # )
-
-        return cloudinary_storage_image  # , local_storage_image
+        return {
+            CLOUDINARY_SECURE_URL: urljoin(
+                (
+                    settings.PREFIX_PUBLIC_CLOUDINARY_URL
+                    if settings.PREFIX_PUBLIC_CLOUDINARY_URL.endswith("/")
+                    else settings.PREFIX_PUBLIC_CLOUDINARY_URL + "/"
+                ),
+                f"{public_id}.{extension}",
+            ),
+            CLOUDINARY_PUBLIC_ID: public_id,
+        }
 
     @staticmethod
     def move_image(image_url, image_type, label_name):

@@ -34,6 +34,7 @@ def custom_exception_handler(exc, context):
             exceptions.Throttled,
             exceptions.NotAuthenticated,
             exceptions.AuthenticationFailed,
+            exceptions.MethodNotAllowed,
         ),
     ):
         return Response(

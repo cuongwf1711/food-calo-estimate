@@ -30,6 +30,8 @@ class EmailService:
         "my_avatar.jpg",
     ]
 
+    IMAGES_DIR = os.path.join(settings.BASE_DIR, "images")
+
     def __init__(
         self,
         subject: str,
@@ -81,9 +83,8 @@ class EmailService:
         email.attach_alternative(html, "text/html")
         email.mixed_subtype = "related"
 
-        img_dir = os.path.join(settings.BASE_DIR, "images")
         for index, img_name in enumerate(self.images):
-            image_path = os.path.join(img_dir, img_name)
+            image_path = os.path.join(self.IMAGES_DIR, img_name)
             try:
                 with open(image_path, "rb") as fr:
                     img = MIMEImage(fr.read())
