@@ -35,7 +35,7 @@ def shuffle_timestamps():
     batch = []
 
     for img in qs.iterator(chunk_size=BATCH_SIZE):
-        # tính earliest_time không trước ngày user tạo và không quá DAYS_AGO trước
+        # calculate earliest_time not before user creation date and not more than DAYS_AGO before
         earliest = max(cutoff, img.user.date_joined)
 
         img.created_at = random_datetime_between(earliest, now)
@@ -49,7 +49,7 @@ def shuffle_timestamps():
             MyInputImage.objects.bulk_update(batch, update_fields)
             batch.clear()
 
-    # bulk_update phần còn lại
+    # bulk_update remaining items
     if batch:
         MyInputImage.objects.bulk_update(batch, update_fields)
 

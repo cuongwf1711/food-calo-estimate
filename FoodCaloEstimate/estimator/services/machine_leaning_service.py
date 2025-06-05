@@ -36,12 +36,13 @@ class MachineLearningService:
         """Calculate calories."""
         if label == UNKNOWN_INDEX:
             return UNKNOWN_CALO
+        label_calorie = FoodDictionary.get_calories(label)
         if reference_point_pixel_area < THRESHHOLD_PIXEL_REFERENCE_POINT_AREA:
-            return FoodDictionary.get_calories(label) * 100  # type: ignore
+            return label_calorie * 100  # type: ignore
         return round(
             food_pixel_area
             * (REFERENCE_POINT_REAL_AREA / reference_point_pixel_area)
-            * FoodDictionary.get_calories(label),  # type: ignore
+            * label_calorie,  # type: ignore
             2,
         )
 
@@ -53,25 +54,23 @@ class MachineLearningService:
             label: np.concatenate([np.random.random(3), [0.6]])
             for label in TEXT_PROMPT_LIST
         }
+        img_array = np.array(image, dtype=np.uint8)
         for mask, label in zip(masks, labels):
-            color_array = (np.array(SEGMENTATION_COLORS[label][:3]) * 255).astype(
-                np.uint8
-            )
-            alpha = SEGMENTATION_COLORS[label][3]
+            # Use boolean indexing for faster mask application
+            mask_bool = mask.astype(bool) if mask.dtype != bool else mask
+            if not mask_bool.any():
+                continue
 
-            mask_rgb = np.zeros((mask.shape[0], mask.shape[1], 3), dtype=np.uint8)
-            mask_rgb[mask > 0] = color_array
+            color_info = SEGMENTATION_COLORS[label]
+            color_rgb = (color_info[:3] * 255).astype(np.uint8)
+            alpha = color_info[3]
 
-            mask_alpha = np.zeros((mask.shape[0], mask.shape[1]), dtype=np.uint8)
-            mask_alpha[mask > 0] = int(alpha * 255)
-
-            mask_image = Image.fromarray(mask_rgb)
-            mask_alpha = Image.fromarray(mask_alpha, mode="L")
-            mask_image.putalpha(mask_alpha)
-
-            image.paste(mask_image, (0, 0), mask_alpha)
+            img_array[mask_bool] = (
+                img_array[mask_bool].astype(np.float32) * (1 - alpha)
+                + color_rgb.astype(np.float32) * alpha
+            ).astype(np.uint8)
 
         buffer = BytesIO()
-        image.save(buffer, format=FORMAT_IMAGE)
+        Image.fromarray(img_array, mode="RGB").save(buffer, format=FORMAT_IMAGE)
         buffer.seek(0)
         return buffer

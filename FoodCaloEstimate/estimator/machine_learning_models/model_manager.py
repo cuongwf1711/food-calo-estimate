@@ -5,10 +5,8 @@
 
 """Model Manager."""
 
-from FoodCaloEstimate.estimator.constants.model_checkpoint_constants import (
+from FoodCaloEstimate.estimator.constants.model_checkpoint_constants import (  # ConvNextV2,; EfficientNetV2,
     MACHINE_LEARNING_MODELS,
-    # ConvNextV2,
-    # EfficientNetV2,
     SegmentationModel_Key,
     SwinTransformerV2,
 )
@@ -29,7 +27,7 @@ class ModelManager:
 
     @classmethod
     def initialize_models(cls):
-        """Khởi tạo tất cả models"""
+        """Initialize all models"""
         if not cls._initialized:
             cls._force_cleanup()
 

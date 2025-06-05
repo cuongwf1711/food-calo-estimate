@@ -148,7 +148,6 @@ class InputImageSerializer(serializers.ModelSerializer):
                 {},
             ),
         )
-        segmentation_image_byteio.close()
 
         validated_data["url"] = {
             ORIGIN_IMAGE: origin_image_cloudinary,
