@@ -8,6 +8,9 @@
 import time
 from functools import wraps
 
+GREEN = "\033[92m"
+RESET = "\033[0m"
+
 
 def time_measure(func):
     """Decorator to measure the execution time of a function."""
@@ -18,7 +21,7 @@ def time_measure(func):
         start = time.time()
         result = func(*args, **kwargs)
         duration = time.time() - start
-        print(f"[TIMING] {func.__qualname__} took {duration:.4f}s")
+        print(f"{GREEN}[TIMING] {func.__qualname__} took {duration:.4f}s{RESET}")
         return result
 
     return wrapper

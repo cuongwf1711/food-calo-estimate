@@ -5,8 +5,9 @@
 
 """Model Manager."""
 
-from FoodCaloEstimate.estimator.constants.model_checkpoint_constants import (  # ConvNextV2,; EfficientNetV2,
+from FoodCaloEstimate.estimator.constants.model_checkpoint_constants import (  # ConvNextV2,;
     MACHINE_LEARNING_MODELS,
+    EfficientNetV2,
     SegmentationModel_Key,
     SwinTransformerV2,
 )
@@ -32,10 +33,9 @@ class ModelManager:
             cls._force_cleanup()
 
             models = [
-                # EfficientNetV2,
-                # ConvNextV2,
                 SwinTransformerV2,
-            ]  # , ConvNextV2, SwinTransformerV2, EfficientNetV2
+                EfficientNetV2,
+            ]
             for model in models:
                 cls._models[model] = ClassificationModel(
                     MACHINE_LEARNING_MODELS[model]["model_name"],
@@ -54,7 +54,7 @@ class ModelManager:
                 "Models have not been initialized. Call initialize_models() first."
             )
 
-        return cls._models.get(model_name, cls._models[SwinTransformerV2])
+        return cls._models.get(model_name, cls._models[EfficientNetV2])
 
     @classmethod
     def release_models(cls):
