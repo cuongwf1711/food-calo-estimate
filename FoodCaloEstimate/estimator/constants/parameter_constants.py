@@ -35,7 +35,7 @@ TEXT_PROMPT = ".".join(TEXT_PROMPT_LIST)
 
 # Grounding Dino Hugging Face Model
 BOX_THRESHOLD_GROUND_DINO = 0.4  # default 0.25
-TEXT_THRESHOLD = 0.3  # default 0.25
+TEXT_THRESHOLD = 0.4  # default 0.25
 
 # DinoX dds
 BOX_THRESHOLD_DINOX = 0.3  # default 0.25
