@@ -19,8 +19,10 @@ from FoodCaloEstimate.iam.constants.period_choices import (
     TimePeriod,
 )
 from FoodCaloEstimate.iam.constants.user_constants import (
+    DEFAULT_ACTIVITY_FACTOR,
     DEFAULT_LENGTH_REFERENCE_POINT,
     DEFAULT_WIDTH_REFERENCE_POINT,
+    MAX_ACTIVITY_FACTOR,
     MAX_LENGTH_REFERENCE_POINT,
     MAX_WIDTH_REFERENCE_POINT,
 )
@@ -60,6 +62,15 @@ class UserProfile(UUIDModel, AutoTimeStampedModel):
         max_length=MAX_LENGTH_PERIOD,
         choices=PERIOD_CHOICES,
         default=TimePeriod.DAY.label,
+    )
+    activity_factor = models.DecimalField(
+        max_digits=4,
+        decimal_places=2,
+        default=Decimal(DEFAULT_ACTIVITY_FACTOR),
+        validators=[
+            MinValueValidator(Decimal(0)),
+            MaxValueValidator(Decimal(MAX_ACTIVITY_FACTOR)),
+        ],
     )
 
     @property

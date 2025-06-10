@@ -63,6 +63,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
             "width_reference_point_custom",
             "auto_set_calorie_limit",
             "total_calories",
+            "activity_factor",
         ]
 
         extra_kwargs = {
@@ -81,6 +82,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
                 validated_data.get(
                     "calorie_limit_period", instance.calorie_limit_period
                 ),
+                validated_data.get("activity_factor", instance.activity_factor),
                 instance.calorie_limit,
             )
 

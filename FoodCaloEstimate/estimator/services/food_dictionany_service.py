@@ -20,6 +20,7 @@ class FoodDictionaryService:
 
     def __init__(self):
         """Init."""
+        # FIXME: Adjust food data if needed
         self.__foods = (
             ("bánh cuốn", 2.0),
             ("mì quảng", 3.0),
