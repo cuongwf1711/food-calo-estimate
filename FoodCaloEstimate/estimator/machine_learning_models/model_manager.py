@@ -9,7 +9,7 @@ from FoodCaloEstimate.estimator.constants.model_checkpoint_constants import (  #
     MACHINE_LEARNING_MODELS,
     EfficientNetV2,
     SegmentationModel_Key,
-    SwinTransformerV2,
+    # SwinTransformerV2,
 )
 from FoodCaloEstimate.estimator.machine_learning_models.classification_model import (
     ClassificationModel,
@@ -33,7 +33,7 @@ class ModelManager:
             cls._force_cleanup()
 
             models = [
-                SwinTransformerV2,
+                # SwinTransformerV2,
                 EfficientNetV2,
             ]
             for model in models:

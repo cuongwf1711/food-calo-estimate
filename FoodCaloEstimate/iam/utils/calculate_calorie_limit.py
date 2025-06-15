@@ -33,7 +33,7 @@ def calculate_calorie_limit(
     total_calculated_bmr = base_bmr_calculation + gender_specific_adjustment
 
     # Calculate the total daily energy expenditure (TDEE)
-    total_daily_energy_expenditure = total_calculated_bmr * activity_factor  # type: ignore
+    total_daily_energy_expenditure = total_calculated_bmr * float(activity_factor)  # type: ignore
 
     total_calculated_bmr = total_daily_energy_expenditure * TimePeriod.from_label(
         period_label
