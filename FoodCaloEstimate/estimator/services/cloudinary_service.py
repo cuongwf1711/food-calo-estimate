@@ -60,3 +60,7 @@ class CloudinaryService:
         cloudinary.api.delete_resources(
             image_dict.get(SEGMENTATION_IMAGE).get(CLOUDINARY_PUBLIC_ID)
         )
+
+    def init_folder(self, path):
+        """Initialize the folder."""
+        cloudinary.api.create_folder(path)
