@@ -20,10 +20,11 @@ class CustomTokenVerifySerializer(TokenVerifySerializer):
 
     def validate(self, attrs: dict[str, None]) -> dict[Any, Any]:
         """Validate the token."""
-        token = AccessToken(attrs["token"])
         try:
-            user = User.objects.get(token.payload.get("user_id"))
-        except:
+            token = AccessToken(attrs["token"])
+            user = User.objects.get(id=token.payload.get("user_id"))
+        except Exception as e:
+            print(e)
             raise serializers.ValidationError("Token is invalid or expired.")
         if not user.is_active:
             raise serializers.ValidationError("User is inactive.")
