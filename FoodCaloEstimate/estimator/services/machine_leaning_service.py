@@ -47,7 +47,7 @@ class MachineLearningService:
             reference_point_pixel_area < THRESHOLD_PIXEL_REFERENCE_POINT_AREA
             or food_pixel_area < THRESHOLD_PIXEL_FOOD_AREA
         ):
-            return label_calorie * 100  # type: ignore
+            return round(label_calorie * 100)  # type: ignore
         return round(
             food_pixel_area
             * (REFERENCE_POINT_REAL_AREA / reference_point_pixel_area)
