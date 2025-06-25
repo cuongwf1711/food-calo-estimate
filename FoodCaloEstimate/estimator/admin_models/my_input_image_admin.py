@@ -6,6 +6,8 @@
 """My Input Image Admin."""
 
 from django.contrib.admin import EmptyFieldListFilter
+from django.db.models.query import QuerySet
+from django.http import HttpRequest
 from django.utils.html import format_html
 
 from FoodCaloEstimate.estimator.admin_models.chart_admin_model import ChartAdminModel
@@ -107,7 +109,7 @@ class MyInputImageAdmin(ChartAdminModel):
 
     def delete_model(self, request, obj):
         """Delete model."""
-        run_task_in_queue(ImageService().delete_image, obj.url)
+        run_task_in_queue(ImageService.delete_image, obj.url)
         return super().delete_model(request, obj)
 
     def has_add_permission(self, request):
@@ -119,3 +121,8 @@ class MyInputImageAdmin(ChartAdminModel):
         if obj and not obj.is_deleted:
             return False
         return super().has_delete_permission(request, obj)
+
+    def delete_queryset(self, request: HttpRequest, queryset: QuerySet) -> None:
+        """Delete queryset."""
+        [run_task_in_queue(ImageService.delete_image, obj.url) for obj in queryset]
+        return super().delete_queryset(request, queryset)
