@@ -9,7 +9,9 @@
 
 import torch
 
-NUM_CLASSES = 37
+from FoodCaloEstimate.estimator.services.food_dictionany_service import FoodDictionary
+
+NUM_CLASSES = len(FoodDictionary.food_data) - 1
 DTYPE_OPTIMIZE_CUDA = torch.bfloat16
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(f"Using device: {DEVICE}")
