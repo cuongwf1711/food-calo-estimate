@@ -126,3 +126,7 @@ class MyInputImageAdmin(ChartAdminModel):
         """Delete queryset."""
         [run_task_in_queue(ImageService.delete_image, obj.url) for obj in queryset]
         return super().delete_queryset(request, queryset)
+
+    def get_queryset(self, request: HttpRequest) -> QuerySet:
+        """Get queryset."""
+        return super().get_queryset(request).select_related("staff", "user")
